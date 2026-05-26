@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Fresh Wave - Your Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="top-bar">
+        <div class="container">
+            <div class="contact-info">
+                <span><i class="fas fa-phone"></i> +256 745 942 209</span>
+                <span><i class="fab fa-whatsapp"></i> +256 764 496 110</span>
+                <span><i class="fas fa-clock"></i> Mon-Sat: 6AM - 8PM</span>
+            </div>
+            <div class="top-links">
+                <a href="index.html"><i class="fas fa-home"></i> Shop</a>
+                <a href="admin.html"><i class="fas fa-headset"></i> Support</a>
+                <button class="ai-chat-btn" onclick="openAIChat()"><i class="fas fa-robot"></i> AI Assistant</button>
+                <a href="tel:+256745942209"><i class="fas fa-phone-alt"></i> Call to Order</a>
+            </div>
+        </div>
+    </div>
+
+    <header>
+        <div class="container">
+            <div class="logo-container">
+                <img src="Fresh logo.jpg" alt="Fresh Wave Logo" class="logo" onerror="this.src='https://placehold.co/80x80/2e8b57/white?text=FW'">
+                <div class="logo-text">
+                    <h1>Fresh Wave</h1>
+                    <p>Your Personal Dashboard</p>
+                </div>
+            </div>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search orders..." onkeyup="searchOrders()">
+                <button onclick="searchOrders()"><i class="fas fa-search"></i></button>
+            </div>
+            <div class="header-actions">
+                <div class="user-dropdown-container">
+                    <button class="user-btn" onclick="toggleUserMenu()">
+                        <i class="fas fa-user-circle"></i>
+                        <span id="userNameDisplay">Account</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="user-menu" id="userMenu">
+                        <div class="user-info" id="userInfoSection">
+                            <p>Welcome back!</p>
+                            <button onclick="showLoginModal()"><i class="fas fa-sign-in-alt"></i> Login</button>
+                            <button onclick="showRegisterModal()"><i class="fas fa-user-plus"></i> Register</button>
+                        </div>
+                        <div class="user-links" id="userLinksSection" style="display:none;">
+                            <a href="#" onclick="showProfile()"><i class="fas fa-user"></i> My Profile</a>
+                            <a href="#" onclick="showOrderHistory()"><i class="fas fa-history"></i> Order History</a>
+                            <a href="#" onclick="showWishlist()"><i class="fas fa-heart"></i> Wishlist</a>
+                            <a href="index.html"><i class="fas fa-shopping-cart"></i> Continue Shopping</a>
+                            <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="cart-icon-container">
+                    <button class="cart-btn" onclick="window.location.href='index.html'">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-badge" id="cartCount">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav class="navbar">
+        <div class="container">
+            <ul>
+                <li><a href="index.html">🏠 Home</a></li>
+                <li><a href="index.html#products">🛒 Shop</a></li>
+                <li><a href="dashboard.html" class="active">📊 Dashboard</a></li>
+                <li><a href="#orders">📦 My Orders</a></li>
+                <li><a href="#tracking">📍 Track Order</a></li>
+                <li><a href="#profile">👤 Profile</a></li>
+                <li><a href="admin.html">📞 Support</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section class="dashboard-hero">
+            <div class="container">
+                <h1><i class="fas fa-chart-line"></i> Your Dashboard</h1>
+                <p>Manage your orders, track deliveries, and update your profile</p>
+            </div>
+        </section>
+
+        <section class="stats-section">
+            <div class="container">
+                <div class="stats-grid">
+                    <div class="stat-card"><i class="fas fa-shopping-bag"></i><div class="stat-info"><h3 id="totalOrdersCount">0</h3><p>Total Orders</p></div></div>
+                    <div class="stat-card"><i class="fas fa-clock"></i><div class="stat-info"><h3 id="pendingOrdersCount">0</h3><p>Pending Orders</p></div></div>
+                    <div class="stat-card"><i class="fas fa-check-circle"></i><div class="stat-info"><h3 id="deliveredOrdersCount">0</h3><p>Delivered</p></div></div>
+                    <div class="stat-card"><i class="fas fa-gem"></i><div class="stat-info"><h3 id="totalSpent">UGX 0</h3><p>Total Spent</p></div></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="orders" class="orders-section">
+            <div class="container">
+                <h2><i class="fas fa-history"></i> My Order History</h2>
+                <div class="order-filters">
+                    <button class="filter-btn active" onclick="filterOrders('all')">All Orders</button>
+                    <button class="filter-btn" onclick="filterOrders('confirmed')">Confirmed</button>
+                    <button class="filter-btn" onclick="filterOrders('delivered')">Delivered</button>
+                    <button class="filter-btn" onclick="filterOrders('cancelled')">Cancelled</button>
+                </div>
+                <div id="orderHistoryList" class="order-history-list"></div>
+            </div>
+        </section>
+
+        <section id="tracking" class="tracking-section">
+            <div class="container">
+                <h2><i class="fas fa-truck"></i> Track Your Order with Live Map</h2>
+                <div class="tracking-card">
+                    <div class="tracking-input">
+                        <input type="text" id="trackOrderNumber" placeholder="Enter Order Number (e.g., ORD-12345)">
+                        <button onclick="trackOrderWithMap()">Track Order</button>
+                    </div>
+                    <div id="trackResult" class="track-result"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="profile" class="profile-section">
+            <div class="container">
+                <h2><i class="fas fa-user-circle"></i> My Profile</h2>
+                <div class="profile-card">
+                    <div class="profile-picture-large">
+                        <img id="profileImageLarge" src="https://placehold.co/120x120/2e8b57/white?text=User" alt="Profile">
+                        <button onclick="uploadProfileImageLarge()" class="upload-photo-btn"><i class="fas fa-camera"></i> Change Photo</button>
+                        <input type="file" id="profileImageInputLarge" style="display:none" accept="image/*">
+                    </div>
+                    <div class="profile-form">
+                        <div class="form-row"><div class="form-group"><label>Full Name</label><input type="text" id="profileNameLarge"></div><div class="form-group"><label>Email</label><input type="email" id="profileEmailLarge" readonly></div></div>
+                        <div class="form-row"><div class="form-group"><label>Phone</label><input type="tel" id="profilePhoneLarge"></div><div class="form-group"><label>Area</label><select id="profileAreaLarge"><option>Kampala Central</option><option>Nakawa</option><option>Makindye</option><option>Kawempe</option><option>Rubaga</option><option>Kalerwe</option></select></div></div>
+                        <div class="form-group"><label>Address</label><textarea id="profileAddressLarge" rows="2"></textarea></div>
+                        <button onclick="saveProfileLarge()" class="save-profile-btn">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- MODALS -->
+    <div id="authModal" class="modal"><div class="modal-content"><span class="close" onclick="closeModal()">&times;</span>
+        <div id="loginForm"><h3>Login</h3><input type="email" id="loginEmail" placeholder="Email"><input type="password" id="loginPassword" placeholder="Password"><button onclick="login()">Login</button><p>No account? <a href="#" onclick="showRegisterModal()">Register</a></p></div>
+        <div id="registerForm" style="display:none"><h3>Register</h3><input type="text" id="regName" placeholder="Full Name"><input type="email" id="regEmail" placeholder="Email"><input type="tel" id="regPhone" placeholder="Phone"><input type="password" id="regPassword" placeholder="Password"><button onclick="register()">Register</button><p>Have account? <a href="#" onclick="showLoginModal()">Login</a></p></div>
+    </div></div>
+
+    <div id="profileModal" class="modal"><div class="modal-content"><span class="close" onclick="closeProfileModal()">&times;</span><h2>My Profile</h2>
+        <div class="profile-picture"><img id="profileImage" src="https://placehold.co/100x100/2e8b57/white?text=User"><button onclick="uploadProfileImage()">Upload Photo</button><input type="file" id="profileImageInput" style="display:none" accept="image/*"></div>
+        <div class="form-group"><label>Full Name:</label><input type="text" id="profileName"></div><div class="form-group"><label>Email:</label><input type="email" id="profileEmail" readonly></div>
+        <div class="form-group"><label>Phone:</label><input type="tel" id="profilePhone"></div><div class="form-group"><label>Address:</label><textarea id="profileAddress" rows="2"></textarea></div>
+        <button onclick="saveProfile()" class="save-profile-btn">Save Profile</button>
+    </div></div>
+
+    <div id="wishlistModal" class="modal"><div class="modal-content"><span class="close" onclick="closeWishlistModal()">&times;</span><h2><i class="fas fa-heart"></i> My Wishlist</h2><div id="wishlistItems" class="wishlist-grid"></div></div></div>
+
+    <div id="aiChatModal" class="modal"><div class="modal-content chat-modal-content"><span class="close" onclick="closeAIChat()">&times;</span>
+        <div class="chat-header"><i class="fas fa-robot"></i><h3>Fresh Wave AI Assistant</h3><span class="ai-status">Online</span></div>
+        <div class="chat-messages" id="chatMessages"><div class="bot-message">👋 Hello! Ask me about your orders or delivery!</div></div>
+        <div class="chat-input-area"><input type="text" id="chatInput" placeholder="Type your question..." onkeypress="if(event.key==='Enter') sendChatMessage()"><button onclick="sendChatMessage()"><i class="fas fa-paper-plane"></i></button></div>
+        <div class="chat-footer"><button onclick="transferToHuman()" class="human-support-btn"><i class="fab fa-whatsapp"></i> Chat with Human</button></div>
+    </div></div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section"><img src="Fresh logo.jpg" class="footer-logo"><p><strong>Fresh Wave</strong><br>Kampala, Uganda</p></div>
+                <div class="footer-section"><h4>Quick Links</h4><ul><li><a href="index.html">Shop</a></li><li><a href="dashboard.html">Dashboard</a></li><li><a href="admin.html">Support</a></li></ul></div>
+                <div class="footer-section"><h4>Contact</h4><p><i class="fas fa-phone"></i> +256 745 942 209<br><i class="fab fa-whatsapp"></i> +256 764 496 110</p></div>
+                <div class="footer-section"><h4>Follow Us</h4><div class="social-icons"><a href="#"><i class="fab fa-facebook"></i></a><a href="#"><i class="fab fa-instagram"></i></a><a href="https://wa.me/256764496110"><i class="fab fa-whatsapp"></i></a></div></div>
+            </div>
+            <div class="footer-bottom"><p>&copy; 2026 Fresh Wave Uganda. All rights reserved.</p></div>
+        </div>
+    </footer>
+
+    <a href="https://wa.me/256764496110" class="whatsapp-float" target="_blank"><i class="fab fa-whatsapp"></i></a>
+    <button id="backToTop" onclick="scrollToTop()"><i class="fas fa-arrow-up"></i></button>
+    <button class="ai-float-btn" onclick="openAIChat()"><i class="fas fa-robot"></i></button>
+
+    <script src="script.js"></script>
+</body>
+</html>

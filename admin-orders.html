@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Fresh Wave - Manage Orders</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .page-header {
+            background: linear-gradient(135deg, #2e8b57, #4CAF50);
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+        }
+        .page-header h1 { font-size: 1.6rem; margin-bottom: 8px; }
+        
+        .admin-nav-bar {
+            background: white;
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+        .admin-nav-bar ul {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+        .admin-nav-bar a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            padding: 8px 18px;
+            border-radius: 30px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        .admin-nav-bar a:hover { background: #2e8b57; color: white; }
+        .logout-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 30px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .orders-filter {
+            display: flex;
+            gap: 10px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .filter-btn {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 8px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+        }
+        .filter-btn.active, .filter-btn:hover {
+            background: #2e8b57;
+            color: white;
+            border-color: #2e8b57;
+        }
+        
+        .orders-table-container {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+        .orders-table th, .orders-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .orders-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        .status-confirmed { background: #2196F3; color: white; }
+        .status-preparing { background: #ff9800; color: white; }
+        .status-onway { background: #ff6b6b; color: white; }
+        .status-delivered { background: #2e8b57; color: white; }
+        .status-cancelled { background: #999; color: white; }
+        
+        .action-btns {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .action-btns select {
+            padding: 6px 10px;
+            border-radius: 20px;
+            border: 1px solid #ddd;
+            font-size: 12px;
+            background: white;
+        }
+        .whatsapp-link {
+            background: #25D366;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .view-details-btn {
+            background: #2196F3;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .refresh-btn {
+            background: #2e8b57;
+            color: white;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .modal-content { max-width: 500px; }
+        .order-items-list { max-height: 300px; overflow-y: auto; }
+        
+        @media (max-width: 768px) {
+            .orders-filter { gap: 8px; }
+            .filter-btn { padding: 6px 12px; font-size: 11px; }
+            .action-btns { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <script>
+        (function checkAdminAccess() {
+            const isLoggedIn = sessionStorage.getItem('adminLoggedIn') === 'true';
+            if (!isLoggedIn && !window.location.pathname.includes('admin-login.html')) {
+                window.location.href = 'admin-login.html';
+            }
+        })();
+    </script>
+
+    <div class="admin-nav-bar">
+        <div class="container">
+            <ul>
+                <li><a href="admin.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="admin-orders.html" style="background:#2e8b57; color:white;"><i class="fas fa-clipboard-list"></i> Orders</a></li>
+                <li><a href="admin-customers.html"><i class="fas fa-users"></i> Customers</a></li>
+                <li><a href="admin-stats.html"><i class="fas fa-chart-line"></i> Statistics</a></li>
+                <li><button class="logout-btn" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="page-header">
+        <div class="container">
+            <h1><i class="fas fa-clipboard-list"></i> Manage Orders</h1>
+            <p>View, update, and track all customer orders</p>
+        </div>
+    </div>
+
+    <main>
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin: 20px 0;">
+                <h2><i class="fas fa-shopping-cart"></i> All Orders</h2>
+                <button class="refresh-btn" onclick="loadOrdersTable()"><i class="fas fa-sync-alt"></i> Refresh Orders</button>
+            </div>
+
+            <div class="orders-filter">
+                <button class="filter-btn active" onclick="filterOrders('all')">All Orders</button>
+                <button class="filter-btn" onclick="filterOrders('confirmed')">Confirmed</button>
+                <button class="filter-btn" onclick="filterOrders('preparing')">Preparing</button>
+                <button class="filter-btn" onclick="filterOrders('onway')">On The Way</button>
+                <button class="filter-btn" onclick="filterOrders('delivered')">Delivered</button>
+                <button class="filter-btn" onclick="filterOrders('cancelled')">Cancelled</button>
+            </div>
+
+            <div class="orders-table-container">
+                <table class="orders-table">
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Payment</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTableBody">
+                        <tr><td colspan="7" style="text-align:center; padding:40px;">Loading orders...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Order Details Modal -->
+    <div id="orderDetailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeOrderDetailsModal()">&times;</span>
+            <h2><i class="fas fa-receipt"></i> Order Details</h2>
+            <div id="orderDetailsContent"></div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section"><img src="Fresh logo.jpg" class="footer-logo"><p><strong>Fresh Wave</strong><br>Kampala, Uganda</p></div>
+                <div class="footer-section"><h4>Admin Links</h4><ul><li><a href="admin-orders.html">Orders</a></li><li><a href="admin-customers.html">Customers</a></li><li><a href="admin-stats.html">Statistics</a></li></ul></div>
+                <div class="footer-section"><h4>Contact</h4><p><i class="fas fa-phone"></i> +256 745 942 209</p></div>
+                <div class="footer-section"><h4>Follow Us</h4><div class="social-icons"><a href="#"><i class="fab fa-facebook"></i></a><a href="#"><i class="fab fa-instagram"></i></a><a href="https://wa.me/256764496110"><i class="fab fa-whatsapp"></i></a></div></div>
+            </div>
+            <div class="footer-bottom"><p>&copy; 2026 Fresh Wave Uganda. All rights reserved.</p></div>
+        </div>
+    </footer>
+
+    <a href="https://wa.me/256764496110" class="whatsapp-float" target="_blank"><i class="fab fa-whatsapp"></i></a>
+    <button id="backToTop" onclick="scrollToTop()"><i class="fas fa-arrow-up"></i></button>
+
+    <script src="script.js"></script>
+    <script>
+        let currentFilter = 'all';
+        let allOrdersCache = [];
+        
+        function loadOrdersTable() {
+            const allOrders = JSON.parse(localStorage.getItem('all_orders') || '[]');
+            allOrdersCache = allOrders;
+            displayOrders(allOrders);
+        }
+        
+        function displayOrders(orders) {
+            const tbody = document.getElementById('ordersTableBody');
+            if (orders.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:40px;">No orders found</td></tr>';
+                return;
+            }
+            
+            orders.sort((a, b) => new Date(b.date) - new Date(a.date));
+            tbody.innerHTML = orders.map(order => `
+                <tr>
+                    <td><strong>${order.orderNumber}</strong></td>
+                    <td>${order.customerEmail ? order.customerEmail.split('@')[0] : 'Guest'}</td>
+                    <td style="font-size:12px;">${order.date}</td>
+                    <td>UGX ${(order.total || 0).toLocaleString()}</td>
+                    <td>${order.paymentMethod || 'N/A'}</td>
+                    <td><span class="status-badge status-${order.status || 'confirmed'}">${order.status || 'Confirmed'}</span></td>
+                    <td class="action-btns">
+                        <select onchange="updateOrderStatus('${order.orderNumber}', this.value)">
+                            <option value="confirmed" ${order.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
+                            <option value="preparing" ${order.status === 'preparing' ? 'selected' : ''}>Preparing</option>
+                            <option value="onway" ${order.status === 'onway' ? 'selected' : ''}>On The Way</option>
+                            <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>Delivered</option>
+                            <option value="cancelled" ${order.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+                        </select>
+                        <a href="https://wa.me/${order.customerPhone || '256764496110'}" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i> Chat</a>
+                        <button class="view-details-btn" onclick="viewOrderDetails('${order.orderNumber}')"><i class="fas fa-eye"></i> View</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function filterOrders(status) {
+            currentFilter = status;
+            const filtered = status === 'all' ? allOrdersCache : allOrdersCache.filter(o => o.status === status);
+            displayOrders(filtered);
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            if (event && event.target) event.target.classList.add('active');
+        }
+        
+        function updateOrderStatus(orderNumber, newStatus) {
+            const allOrders = JSON.parse(localStorage.getItem('all_orders') || '[]');
+            const orderIndex = allOrders.findIndex(o => o.orderNumber === orderNumber);
+            
+            if (orderIndex !== -1) {
+                allOrders[orderIndex].status = newStatus;
+                allOrders[orderIndex].deliveryStatus = newStatus;
+                localStorage.setItem('all_orders', JSON.stringify(allOrders));
+                
+                const customerEmail = allOrders[orderIndex].customerEmail;
+                if (customerEmail) {
+                    const customerOrders = JSON.parse(localStorage.getItem(`orders_${customerEmail}`) || '[]');
+                    const customerOrderIndex = customerOrders.findIndex(o => o.orderNumber === orderNumber);
+                    if (customerOrderIndex !== -1) {
+                        customerOrders[customerOrderIndex].status = newStatus;
+                        customerOrders[customerOrderIndex].deliveryStatus = newStatus;
+                        localStorage.setItem(`orders_${customerEmail}`, JSON.stringify(customerOrders));
+                    }
+                }
+                
+                showNotification(`Order #${orderNumber} updated to ${newStatus}`, 'success');
+                loadOrdersTable();
+                filterOrders(currentFilter);
+            }
+        }
+        
+        function viewOrderDetails(orderNumber) {
+            const allOrders = JSON.parse(localStorage.getItem('all_orders') || '[]');
+            const order = allOrders.find(o => o.orderNumber === orderNumber);
+            
+            if (order) {
+                const itemsHtml = order.items ? order.items.map(i => `
+                    <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee;">
+                        <span>${i.name} x${i.quantity}</span>
+                        <span>UGX ${(i.price * i.quantity).toLocaleString()}</span>
+                    </div>
+                `).join('') : '<p>No items</p>';
+                
+                document.getElementById('orderDetailsContent').innerHTML = `
+                    <div style="margin-bottom:15px;">
+                        <p><strong>Order Number:</strong> ${order.orderNumber}</p>
+                        <p><strong>Date:</strong> ${order.date}</p>
+                        <p><strong>Customer:</strong> ${order.customerEmail || 'Guest'}</p>
+                        <p><strong>Phone:</strong> ${order.customerPhone || 'N/A'}</p>
+                        <p><strong>Delivery Address:</strong> ${order.address || 'N/A'}</p>
+                        <p><strong>Payment Method:</strong> ${order.paymentMethod || 'N/A'}</p>
+                        <p><strong>Status:</strong> <span class="status-badge status-${order.status || 'confirmed'}">${order.status || 'Confirmed'}</span></p>
+                    </div>
+                    <div style="background:#f8f9fa; padding:15px; border-radius:10px;">
+                        <strong>Order Items:</strong>
+                        ${itemsHtml}
+                        <div style="display:flex; justify-content:space-between; margin-top:10px; padding-top:10px; border-top:2px solid #ddd; font-weight:bold;">
+                            <span>Total:</span>
+                            <span>UGX ${(order.total || 0).toLocaleString()}</span>
+                        </div>
+                    </div>
+                    <div style="margin-top:20px; display:flex; gap:10px;">
+                        <a href="https://wa.me/${order.customerPhone || '256764496110'}" target="_blank" class="whatsapp-link" style="flex:1; text-align:center;">Contact Customer</a>
+                        <button onclick="updateOrderStatus('${order.orderNumber}', 'delivered'); closeOrderDetailsModal();" style="flex:1; background:#2e8b57; color:white; border:none; padding:10px; border-radius:10px; cursor:pointer;">Mark Delivered</button>
+                    </div>
+                `;
+                document.getElementById('orderDetailsModal').classList.add('active');
+            }
+        }
+        
+        function closeOrderDetailsModal() {
+            document.getElementById('orderDetailsModal').classList.remove('active');
+        }
+        
+        function adminLogout() {
+            sessionStorage.removeItem('adminLoggedIn');
+            sessionStorage.removeItem('adminLoginTime');
+            sessionStorage.removeItem('adminUsername');
+            window.location.href = 'admin-login.html';
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadOrdersTable();
+        });
+    </script>
+</body>
+</html>

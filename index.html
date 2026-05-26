@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Fresh Wave - Shop Fresh Vegetables, Fruits & Berries</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- TOP BAR -->
+    <div class="top-bar">
+        <div class="container">
+            <div class="contact-info">
+                <span><i class="fas fa-phone"></i> +256 745 942 209</span>
+                <span><i class="fab fa-whatsapp"></i> +256 764 496 110</span>
+                <span><i class="fas fa-clock"></i> Mon-Sat: 6AM - 8PM</span>
+            </div>
+            <div class="top-links">
+                <a href="dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a>
+                <a href="admin.html"><i class="fas fa-headset"></i> Support</a>
+                <button class="ai-chat-btn" onclick="openAIChat()"><i class="fas fa-robot"></i> AI Assistant</button>
+                <a href="tel:+256745942209"><i class="fas fa-phone-alt"></i> Call to Order</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <header>
+        <div class="container">
+            <div class="logo-container">
+                <img src="Fresh logo.jpg" alt="Fresh Wave Logo" class="logo" onerror="this.src='https://placehold.co/80x80/2e8b57/white?text=FW'">
+                <div class="logo-text">
+                    <h1>Fresh Wave</h1>
+                    <p>Quality Vegetables, Fruits & Berries at Your Door</p>
+                </div>
+            </div>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search tomatoes, strawberries, mangoes..." onkeyup="searchProducts()">
+                <button onclick="searchProducts()"><i class="fas fa-search"></i></button>
+                <button class="voice-search-btn" onclick="startVoiceSearch()"><i class="fas fa-microphone"></i></button>
+            </div>
+            <div class="header-actions">
+                <div class="user-dropdown-container">
+                    <button class="user-btn" onclick="toggleUserMenu()">
+                        <i class="fas fa-user-circle"></i>
+                        <span id="userNameDisplay">Account</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="user-menu" id="userMenu">
+                        <div class="user-info" id="userInfoSection">
+                            <p>Welcome back!</p>
+                            <button onclick="showLoginModal()"><i class="fas fa-sign-in-alt"></i> Login</button>
+                            <button onclick="showRegisterModal()"><i class="fas fa-user-plus"></i> Register</button>
+                        </div>
+                        <div class="user-links" id="userLinksSection" style="display:none;">
+                            <a href="dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a>
+                            <a href="#" onclick="showProfile()"><i class="fas fa-user"></i> My Profile</a>
+                            <a href="#" onclick="showWishlist()"><i class="fas fa-heart"></i> Wishlist <span id="wishlistCount" class="badge">0</span></a>
+                            <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="cart-icon-container">
+                    <button class="cart-btn" onclick="toggleCart()">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-badge" id="cartCount">0</span>
+                    </button>
+                    <div class="cart-dropdown" id="cartDropdown">
+                        <h4><i class="fas fa-shopping-cart"></i> My Cart</h4>
+                        <div id="cartItems" class="cart-items"></div>
+                        <div class="cart-footer">
+                            <div class="cart-total"><strong>Total:</strong> <span>UGX <span id="cartTotal">0</span></span></div>
+                            <div class="min-order-progress">
+                                <div class="progress-bar"><div class="progress-fill" id="minOrderFill" style="width:0%"></div></div>
+                                <small id="minOrderMessage">Add UGX 10,000 more for delivery</small>
+                            </div>
+                            <button class="checkout-btn" onclick="goToCheckout()"><i class="fas fa-credit-card"></i> Proceed to Checkout</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="container">
+            <ul>
+                <li><a href="index.html" class="active">🏠 Home</a></li>
+                <li><a href="#products">🛒 Shop</a></li>
+                <li><a href="#flash-sale">⚡ Flash Sale</a></li>
+                <li><a href="#gallery">📷 Gallery</a></li>
+                <li><a href="#pricing">💰 Prices</a></li>
+                <li><a href="#delivery">🚚 Delivery</a></li>
+                <li><a href="dashboard.html">📊 Dashboard</a></li>
+                <li><a href="admin.html">📞 Support</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <!-- HERO -->
+        <section id="home" class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h2>Fresh Produce Delivered to Your Doorstep</h2>
+                    <p>Farm-fresh vegetables, exotic fruits, and premium berries delivered within 1-2 hours in Kampala</p>
+                    <div class="hero-buttons">
+                        <button onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})" class="btn-primary">Shop Now <i class="fas fa-arrow-right"></i></button>
+                        <button onclick="window.location.href='dashboard.html'" class="btn-secondary">View Dashboard <i class="fas fa-chart-line"></i></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- QUICK LINKS -->
+        <section class="quick-links">
+            <div class="container">
+                <h2><i class="fas fa-bolt"></i> Shop by Category</h2>
+                <div class="quick-links-grid">
+                    <div class="quick-link-card" onclick="filterByCategory('vegetables')"><i class="fas fa-carrot"></i><span>Vegetables</span></div>
+                    <div class="quick-link-card" onclick="filterByCategory('fruits')"><i class="fas fa-apple-alt"></i><span>Fruits</span></div>
+                    <div class="quick-link-card" onclick="filterByCategory('berries')"><i class="fas fa-strawberry"></i><span>Berries</span></div>
+                    <div class="quick-link-card" onclick="filterByCategory('root')"><i class="fas fa-potato"></i><span>Root Veggies</span></div>
+                    <div class="quick-link-card" onclick="filterByCategory('all')"><i class="fas fa-th-large"></i><span>All Products</span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FEATURES -->
+        <section class="features">
+            <div class="container">
+                <div class="features-grid">
+                    <div class="feature"><i class="fas fa-truck-fast"></i><h4>Free Delivery</h4><p>On orders over UGX 50,000</p></div>
+                    <div class="feature"><i class="fas fa-clock"></i><h4>1-2 Hour Delivery</h4><p>Fast & reliable</p></div>
+                    <div class="feature"><i class="fas fa-leaf"></i><h4>100% Fresh</h4><p>Quality guaranteed</p></div>
+                    <div class="feature"><i class="fas fa-shield-alt"></i><h4>Secure Payments</h4><p>Airtel Money, MTN MoMo</p></div>
+                    <div class="feature"><i class="fas fa-headset"></i><h4>24/7 Support</h4><p>Chat with us anytime</p></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FLASH SALE -->
+        <section id="flash-sale" class="flash-sale">
+            <div class="container">
+                <div class="sale-header">
+                    <h2><i class="fas fa-bolt"></i> FLASH SALE - 24 HOURS ONLY!</h2>
+                    <div class="countdown"><div class="time-box"><span id="hours">00</span><label>Hours</label></div><div class="time-box"><span id="minutes">00</span><label>Mins</label></div><div class="time-box"><span id="seconds">00</span><label>Secs</label></div></div>
+                </div>
+                <div class="sale-products" id="saleProducts"></div>
+            </div>
+        </section>
+
+        <!-- PRODUCTS SECTION -->
+        <section id="products">
+            <div class="container">
+                <h2><i class="fas fa-leaf"></i> All Fresh Produce</h2>
+                <div class="category-tabs">
+                    <button class="category-tab active" onclick="filterByCategory('all')">All Products</button>
+                    <button class="category-tab" onclick="filterByCategory('vegetables')">Vegetables</button>
+                    <button class="category-tab" onclick="filterByCategory('fruits')">Fruits</button>
+                    <button class="category-tab" onclick="filterByCategory('berries')">Berries</button>
+                    <button class="category-tab" onclick="filterByCategory('root')">Root Veggies</button>
+                </div>
+                <div class="products-layout">
+                    <aside class="filters-sidebar">
+                        <h3><i class="fas fa-filter"></i> Filters</h3>
+                        <div class="filter-group"><label>Price Range (UGX)</label><input type="range" id="priceFilter" min="0" max="50000" step="1000" oninput="updatePriceValue()"><div class="price-values"><span>UGX 0</span><span id="priceValue">UGX 50,000</span></div></div>
+                        <div class="filter-group"><label>Sort By</label><select id="sortFilter" onchange="filterProducts()"><option value="default">Default</option><option value="price-low">Price: Low to High</option><option value="price-high">Price: High to Low</option><option value="popular">Most Popular</option></select></div>
+                        <button class="clear-filters" onclick="clearFilters()">Clear Filters</button>
+                    </aside>
+                    <div class="products-grid" id="productsGrid"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- GALLERY -->
+        <section id="gallery">
+            <div class="container">
+                <h2><i class="fas fa-images"></i> Fresh Produce Gallery</h2>
+                <div class="slideshow-container">
+                    <div class="slide"><img src="Spinach.jpg" alt="Spinach"><div class="slide-caption">Fresh Spinach</div></div>
+                    <div class="slide"><img src="strawberries.jpg" alt="Strawberries"><div class="slide-caption">Fresh Strawberries</div></div>
+                    <div class="slide"><img src="mangoes.jpg" alt="Mangoes"><div class="slide-caption">Sweet Mangoes</div></div>
+                    <button class="prev" onclick="changeSlide(-1)">❮</button><button class="next" onclick="changeSlide(1)">❯</button>
+                </div>
+                <div class="dots-container"></div>
+            </div>
+        </section>
+
+        <!-- DELIVERY AREAS -->
+        <section id="delivery">
+            <div class="container">
+                <h2><i class="fas fa-truck"></i> We Deliver To</h2>
+                <div class="delivery-grid">
+                    <div class="delivery-area">Kampala Central</div><div class="delivery-area">Nakawa</div><div class="delivery-area">Makindye</div>
+                    <div class="delivery-area">Kawempe</div><div class="delivery-area">Rubaga</div><div class="delivery-area">Kalerwe</div>
+                    <div class="delivery-area">Bwaise</div><div class="delivery-area">Ntinda</div><div class="delivery-area">Kololo</div><div class="delivery-area">Naguru</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PRICING TABLE -->
+        <section id="pricing">
+            <div class="container">
+                <h2><i class="fas fa-tags"></i> Current Market Prices</h2>
+                <div class="table-responsive"><table id="pricingTable"><thead><tr><th>Product</th><th>Category</th><th>Price/kg</th><th>Unit</th><th>Action</th></tr></thead><tbody id="pricingTableBody"></tbody></table></div>
+            </div>
+        </section>
+
+        <!-- TESTIMONIALS -->
+        <section id="testimonials">
+            <div class="container">
+                <h2><i class="fas fa-star"></i> Customer Reviews</h2>
+                <div class="testimonials-grid" id="testimonialsGrid">
+                    <div class="testimonial"><div class="stars">★★★★★</div><p>"Best produce in Kampala!"</p><div class="author">Sarah N.</div></div>
+                    <div class="testimonial"><div class="stars">★★★★★</div><p>"Great prices and fast delivery"</p><div class="author">David M.</div></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTACT -->
+        <section id="contact">
+            <div class="container">
+                <h2><i class="fas fa-envelope"></i> Contact Us</h2>
+                <div class="contact-layout">
+                    <div class="contact-info-card">
+                        <div class="info-item"><i class="fas fa-phone"></i><div><strong>Call Us</strong><p><a href="tel:+256745942209">+256 745 942 209</a></p></div></div>
+                        <div class="info-item"><i class="fab fa-whatsapp"></i><div><strong>WhatsApp</strong><p><a href="https://wa.me/256764496110">+256 764 496 110</a></p></div></div>
+                        <div class="info-item"><i class="fas fa-envelope"></i><div><strong>Email</strong><p>info@freshwave.ug</p></div></div>
+                        <div class="info-item"><i class="fas fa-map-marker-alt"></i><div><strong>Address</strong><p>Opposite Kalerwe Market, Kampala</p></div></div>
+                    </div>
+                    <form id="contactForm" class="contact-form">
+                        <div class="form-row"><input type="text" id="contactName" placeholder="Your Name"><input type="tel" id="contactPhone" placeholder="Phone Number"></div>
+                        <input type="email" id="contactEmail" placeholder="Email Address">
+                        <textarea id="contactMessage" rows="4" placeholder="Your Message"></textarea>
+                        <button type="submit">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- CHECKOUT MODAL -->
+    <div id="checkoutModal" class="modal">
+        <div class="modal-content" style="max-width: 650px; max-height: 90vh; overflow-y: auto;">
+            <span class="close" onclick="closeCheckoutModal()">&times;</span>
+            <h2><i class="fas fa-shopping-cart"></i> Checkout</h2>
+            <div id="checkoutSummary" class="checkout-summary"></div>
+            
+            <h3>Delivery Information</h3>
+            <div class="form-group">
+                <textarea id="deliveryAddressInput" rows="2" placeholder="Enter delivery address (Plot, Street, Area, Landmark)" required></textarea>
+            </div>
+
+            <h3>Select Payment Method</h3>
+            <div class="payment-options">
+                <label class="payment-option"><input type="radio" name="paymentMethod" value="airtel" onchange="togglePaymentFields()"> <i class="fas fa-mobile-alt" style="color:#ff6600"></i> Airtel Money</label>
+                <label class="payment-option"><input type="radio" name="paymentMethod" value="mtn" onchange="togglePaymentFields()"> <i class="fas fa-mobile-alt" style="color:#ffcc00"></i> MTN Mobile Money</label>
+                <label class="payment-option"><input type="radio" name="paymentMethod" value="cod" onchange="togglePaymentFields()"> <i class="fas fa-money-bill-wave"></i> Cash on Delivery</label>
+            </div>
+
+            <!-- AIRTEL MONEY PAYMENT SECTION -->
+            <div id="airtelPaymentSection" style="display:none;" class="payment-section">
+                <div class="merchant-info airtel"><i class="fas fa-store"></i><h4>Pay with Airtel Money</h4></div>
+                <div class="merchant-details"><p><strong>📱 Airtel Money Merchant Till Number:</strong></p><div class="till-number-box"><span class="till-number">7104763</span><button class="copy-btn" onclick="copyToClipboard('7104763', 'Airtel till number')"><i class="fas fa-copy"></i> Copy</button></div></div>
+                <div class="steps"><p><strong>How to pay:</strong></p><ol><li>Dial <strong>*185#</strong> or open Airtel Money app</li><li>Select "Send Money"</li><li>Enter Merchant Till: <strong>7104763</strong></li><li>Enter amount: <strong id="airtelStepAmount">UGX 0</strong></li><li>Enter your PIN on your phone</li></ol></div>
+                <div class="form-group"><label>📞 Your Airtel Number:</label><input type="tel" id="airtelPhoneNumber" placeholder="e.g., 0771234567"></div>
+                <div class="form-group"><label>📋 Transaction Reference:</label><input type="text" id="airtelTransactionReference" placeholder="Enter transaction ID"></div>
+                <div class="form-group"><label>💰 Amount Paid (UGX):</label><input type="number" id="airtelAmountPaid" placeholder="Enter exact amount paid"><small>Must match total: UGX <span id="airtelCartTotal">0</span></small></div>
+                <div class="security-note"><i class="fas fa-lock"></i><p>Your PIN is entered on YOUR phone - secure!</p></div>
+            </div>
+
+            <!-- MTN MOBILE MONEY PAYMENT SECTION -->
+            <div id="mtnPaymentSection" style="display:none;" class="payment-section">
+                <div class="merchant-info mtn"><i class="fas fa-store"></i><h4>Pay with MTN Mobile Money</h4></div>
+                <div class="merchant-details"><p><strong>📱 MTN Mobile Money Merchant Number:</strong></p><div class="till-number-box"><span class="till-number mtn-number">61967992</span><button class="copy-btn" onclick="copyToClipboard('61967992', 'MTN merchant number')"><i class="fas fa-copy"></i> Copy</button></div></div>
+                <div class="steps"><p><strong>How to pay:</strong></p><ol><li>Dial <strong>*165#</strong> or open MTN MoMo app</li><li>Select "Send Money"</li><li>Enter Merchant Number: <strong>61967992</strong></li><li>Enter amount: <strong id="mtnStepAmount">UGX 0</strong></li><li>Enter your PIN on your phone</li></ol></div>
+                <div class="form-group"><label>📞 Your MTN Number:</label><input type="tel" id="mtnPhoneNumber" placeholder="e.g., 0781234567"></div>
+                <div class="form-group"><label>📋 Transaction Reference:</label><input type="text" id="mtnTransactionReference" placeholder="Enter transaction ID"></div>
+                <div class="form-group"><label>💰 Amount Paid (UGX):</label><input type="number" id="mtnAmountPaid" placeholder="Enter exact amount paid"><small>Must match total: UGX <span id="mtnCartTotal">0</span></small></div>
+                <div class="security-note"><i class="fas fa-lock"></i><p>Your PIN is entered on YOUR phone - secure!</p></div>
+            </div>
+
+            <!-- CASH ON DELIVERY SECTION -->
+            <div id="codPaymentSection" style="display:none;" class="payment-section">
+                <div class="merchant-info cod"><i class="fas fa-money-bill-wave"></i><h4>Cash on Delivery</h4></div>
+                <div class="merchant-details"><p>You will pay cash when your order is delivered.</p><p><strong>Amount to pay:</strong> UGX <span id="codAmount" class="amount">0</span></p></div>
+            </div>
+
+            <div class="order-summary-footer">
+                <div class="total-display"><strong>Total to Pay:</strong> <span id="finalTotal" class="final-amount">UGX 0</span></div>
+                <button class="confirm-order-btn" onclick="confirmOrder()"><i class="fas fa-check-circle"></i> Place Order</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAYMENT CONFIRMATION MODAL -->
+    <div id="paymentConfirmationModal" class="modal">
+        <div class="modal-content"><span class="close" onclick="closePaymentConfirmationModal()">&times;</span>
+            <div id="confirmationContent"><div class="payment-success-icon"><i class="fas fa-check-circle"></i></div><h3 id="confirmationTitle">Order Confirmed!</h3><p id="confirmationMessage"></p></div>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <div id="authModal" class="modal"><div class="modal-content"><span class="close" onclick="closeModal()">&times;</span>
+        <div id="loginForm"><h3>Login</h3><input type="email" id="loginEmail" placeholder="Email"><input type="password" id="loginPassword" placeholder="Password"><button onclick="login()">Login</button><p>No account? <a href="#" onclick="showRegisterModal()">Register</a></p></div>
+        <div id="registerForm" style="display:none"><h3>Register</h3><input type="text" id="regName" placeholder="Full Name"><input type="email" id="regEmail" placeholder="Email"><input type="tel" id="regPhone" placeholder="Phone"><input type="password" id="regPassword" placeholder="Password"><button onclick="register()">Register</button><p>Have account? <a href="#" onclick="showLoginModal()">Login</a></p></div>
+    </div></div>
+
+    <div id="profileModal" class="modal"><div class="modal-content"><span class="close" onclick="closeProfileModal()">&times;</span><h2>My Profile</h2>
+        <div class="profile-picture"><img id="profileImage" src="https://placehold.co/100x100/2e8b57/white?text=User"><button onclick="uploadProfileImage()">Upload Photo</button><input type="file" id="profileImageInput" style="display:none" accept="image/*"></div>
+        <div class="form-group"><label>Full Name:</label><input type="text" id="profileName"></div>
+        <div class="form-group"><label>Email:</label><input type="email" id="profileEmail" readonly></div>
+        <div class="form-group"><label>Phone:</label><input type="tel" id="profilePhone"></div>
+        <div class="form-group"><label>Address:</label><textarea id="profileAddress" rows="2"></textarea></div>
+        <button onclick="saveProfile()" class="save-profile-btn">Save Profile</button>
+    </div></div>
+
+    <div id="wishlistModal" class="modal"><div class="modal-content"><span class="close" onclick="closeWishlistModal()">&times;</span><h2><i class="fas fa-heart"></i> My Wishlist</h2><div id="wishlistItems" class="wishlist-grid"></div></div></div>
+
+    <div id="aiChatModal" class="modal"><div class="modal-content chat-modal-content"><span class="close" onclick="closeAIChat()">&times;</span>
+        <div class="chat-header"><i class="fas fa-robot"></i><h3>Fresh Wave AI Assistant</h3><span class="ai-status">Online</span></div>
+        <div class="chat-messages" id="chatMessages"><div class="bot-message">👋 Hello! Ask me about products, delivery, or payments!</div></div>
+        <div class="chat-input-area"><input type="text" id="chatInput" placeholder="Type your question..." onkeypress="if(event.key==='Enter') sendChatMessage()"><button onclick="sendChatMessage()"><i class="fas fa-paper-plane"></i></button></div>
+        <div class="chat-footer"><button onclick="transferToHuman()" class="human-support-btn"><i class="fab fa-whatsapp"></i> Chat with Human</button></div>
+    </div></div>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section"><img src="Fresh logo.jpg" class="footer-logo"><p><strong>Fresh Wave</strong><br>Kampala, Uganda</p><p>Airtel: 7104763 | MTN: 61967992</p></div>
+                <div class="footer-section"><h4>Quick Links</h4><ul><li><a href="index.html">Home</a></li><li><a href="dashboard.html">Dashboard</a></li><li><a href="admin.html">Support</a></li></ul></div>
+                <div class="footer-section"><h4>Categories</h4><ul><li><a href="#" onclick="filterByCategory('vegetables')">Vegetables</a></li><li><a href="#" onclick="filterByCategory('fruits')">Fruits</a></li><li><a href="#" onclick="filterByCategory('berries')">Berries</a></li></ul></div>
+                <div class="footer-section"><h4>Follow Us</h4><div class="social-icons"><a href="#"><i class="fab fa-facebook"></i></a><a href="#"><i class="fab fa-instagram"></i></a><a href="https://wa.me/256764496110"><i class="fab fa-whatsapp"></i></a></div></div>
+            </div>
+            <div class="footer-bottom"><p>&copy; 2026 Fresh Wave Uganda. All rights reserved.</p></div>
+        </div>
+    </footer>
+
+    <!-- FLOATING BUTTONS -->
+    <a href="https://wa.me/256764496110" class="whatsapp-float" target="_blank"><i class="fab fa-whatsapp"></i></a>
+    <button id="backToTop" onclick="scrollToTop()"><i class="fas fa-arrow-up"></i></button>
+    <button class="ai-float-btn" onclick="openAIChat()"><i class="fas fa-robot"></i></button>
+
+    <script src="script.js"></script>
+</body>
+</html>
+<!-- Add at the bottom of index.html, right before </body> -->
+<div style="position: fixed; bottom: 10px; right: 10px; opacity: 0.3; z-index: 9999;">
+    <a href="admin-login.html" style="color: #999; text-decoration: none; font-size: 10px; background: white; padding: 2px 5px; border-radius: 5px;">🔒 Admin</a>
+</div>

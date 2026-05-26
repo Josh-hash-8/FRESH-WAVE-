@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Fresh Wave - Customers Management</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .page-header {
+            background: linear-gradient(135deg, #2e8b57, #4CAF50);
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+        }
+        .admin-nav-bar {
+            background: white;
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+        .admin-nav-bar ul {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+        .admin-nav-bar a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            padding: 8px 18px;
+            border-radius: 30px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        .admin-nav-bar a:hover { background: #2e8b57; color: white; }
+        .logout-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 30px;
+            cursor: pointer;
+        }
+        
+        .customer-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+        .customer-stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .customer-stat-card i { font-size: 35px; margin-bottom: 10px; }
+        .customer-stat-card h2 { font-size: 1.8rem; color: #2e8b57; margin: 5px 0; }
+        
+        .customers-table-container {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+        .customers-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+        .customers-table th, .customers-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .customers-table th { background: #f8f9fa; font-weight: 600; }
+        .customer-orders-badge {
+            background: #e8f5e9;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #2e8b57;
+        }
+        .contact-customer-btn {
+            background: #25D366;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .view-customer-btn {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .customer-stats { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 576px) {
+            .customer-stats { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <script>
+        (function checkAdminAccess() {
+            const isLoggedIn = sessionStorage.getItem('adminLoggedIn') === 'true';
+            if (!isLoggedIn && !window.location.pathname.includes('admin-login.html')) {
+                window.location.href = 'admin-login.html';
+            }
+        })();
+    </script>
+
+    <div class="admin-nav-bar">
+        <div class="container">
+            <ul>
+                <li><a href="admin.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="admin-orders.html"><i class="fas fa-clipboard-list"></i> Orders</a></li>
+                <li><a href="admin-customers.html" style="background:#2e8b57; color:white;"><i class="fas fa-users"></i> Customers</a></li>
+                <li><a href="admin-stats.html"><i class="fas fa-chart-line"></i> Statistics</a></li>
+                <li><button class="logout-btn" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="page-header">
+        <div class="container">
+            <h1><i class="fas fa-users"></i> Customer Management</h1>
+            <p>View customer information and order history</p>
+        </div>
+    </div>
+
+    <main>
+        <div class="container">
+            <div class="customer-stats">
+                <div class="customer-stat-card">
+                    <i class="fas fa-users" style="color: #2e8b57;"></i>
+                    <h2 id="totalCustomers">0</h2>
+                    <p>Total Customers</p>
+                </div>
+                <div class="customer-stat-card">
+                    <i class="fas fa-shopping-cart" style="color: #ff9800;"></i>
+                    <h2 id="totalCustomerOrders">0</h2>
+                    <p>Total Orders</p>
+                </div>
+                <div class="customer-stat-card">
+                    <i class="fas fa-chart-line" style="color: #2196F3;"></i>
+                    <h2 id="avgOrderValue">UGX 0</h2>
+                    <p>Average Order Value</p>
+                </div>
+            </div>
+
+            <div class="customers-table-container">
+                <table class="customers-table">
+                    <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Orders</th>
+                            <th>Total Spent</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customersTableBody">
+                        <tr><td colspan="6" style="text-align:center; padding:40px;">Loading customers...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Customer Details Modal -->
+    <div id="customerDetailsModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <span class="close" onclick="closeCustomerDetailsModal()">&times;</span>
+            <h2><i class="fas fa-user-circle"></i> Customer Details</h2>
+            <div id="customerDetailsContent"></div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section"><img src="Fresh logo.jpg" class="footer-logo"><p><strong>Fresh Wave</strong><br>Kampala, Uganda</p></div>
+                <div class="footer-section"><h4>Admin Links</h4><ul><li><a href="admin-orders.html">Orders</a></li><li><a href="admin-customers.html">Customers</a></li><li><a href="admin-stats.html">Statistics</a></li></ul></div>
+                <div class="footer-section"><h4>Contact</h4><p><i class="fas fa-phone"></i> +256 745 942 209</p></div>
+                <div class="footer-section"><h4>Follow Us</h4><div class="social-icons"><a href="#"><i class="fab fa-facebook"></i></a><a href="#"><i class="fab fa-instagram"></i></a><a href="https://wa.me/256764496110"><i class="fab fa-whatsapp"></i></a></div></div>
+            </div>
+            <div class="footer-bottom"><p>&copy; 2026 Fresh Wave Uganda. All rights reserved.</p></div>
+        </div>
+    </footer>
+
+    <a href="https://wa.me/256764496110" class="whatsapp-float" target="_blank"><i class="fab fa-whatsapp"></i></a>
+    <button id="backToTop" onclick="scrollToTop()"><i class="fas fa-arrow-up"></i></button>
+
+    <script src="script.js"></script>
+    <script>
+        function loadCustomersTable() {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const allOrders = JSON.parse(localStorage.getItem('all_orders') || '[]');
+            
+            document.getElementById('totalCustomers') && (document.getElementById('totalCustomers').textContent = users.length);
+            document.getElementById('totalCustomerOrders') && (document.getElementById('totalCustomerOrders').textContent = allOrders.length);
+            
+            const avgValue = allOrders.length > 0 ? allOrders.reduce((s, o) => s + (o.total || 0), 0) / allOrders.length : 0;
+            document.getElementById('avgOrderValue') && (document.getElementById('avgOrderValue').textContent = `UGX ${Math.round(avgValue).toLocaleString()}`);
+            
+            const tbody = document.getElementById('customersTableBody');
+            if (users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px;">No customers yet</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = users.map(user => {
+                const userOrders = allOrders.filter(o => o.customerEmail === user.email);
+                const totalSpent = userOrders.reduce((sum, o) => sum + (o.total || 0), 0);
+                return `
+                    <tr>
+                        <td><strong>${user.name}</strong></td>
+                        <td>${user.email}</td>
+                        <td>${user.phone || 'N/A'}</td>
+                        <td><span class="customer-orders-badge">${userOrders.length} orders</span></td>
+                        <td>UGX ${totalSpent.toLocaleString()}</td>
+                        <td>
+                            <a href="https://wa.me/${user.phone || '256764496110'}" target="_blank" class="contact-customer-btn"><i class="fab fa-whatsapp"></i> Contact</a>
+                            <button class="view-customer-btn" onclick="viewCustomerDetails('${user.email}')"><i class="fas fa-eye"></i> View</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        function viewCustomerDetails(email) {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const user = users.find(u => u.email === email);
+            const allOrders = JSON.parse(localStorage.getItem('all_orders') || '[]');
+            const userOrders = allOrders.filter(o => o.customerEmail === email);
+            const totalSpent = userOrders.reduce((sum, o) => sum + (o.total || 0), 0);
+            
+            const ordersHtml = userOrders.map(order => `
+                <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee;">
+                    <span>#${order.orderNumber}</span>
+                    <span>${order.date}</span>
+                    <span>UGX ${(order.total || 0).toLocaleString()}</span>
+                    <span class="status-badge status-${order.status || 'confirmed'}">${order.status || 'Confirmed'}</span>
+                </div>
+            `).join('');
+            
+            document.getElementById('customerDetailsContent').innerHTML = `
+                <div style="margin-bottom:15px;">
+                    <p><strong>Name:</strong> ${user.name}</p>
+                    <p><strong>Email:</strong> ${user.email}</p>
+                    <p><strong>Phone:</strong> ${user.phone || 'N/A'}</p>
+                    <p><strong>Address:</strong> ${user.address || 'N/A'}</p>
+                    <p><strong>Total Orders:</strong> ${userOrders.length}</p>
+                    <p><strong>Total Spent:</strong> UGX ${totalSpent.toLocaleString()}</p>
+                </div>
+                <div style="background:#f8f9fa; padding:15px; border-radius:10px;">
+                    <strong>Order History:</strong>
+                    ${ordersHtml || '<p>No orders</p>'}
+                </div>
+                <div style="margin-top:20px;">
+                    <a href="https://wa.me/${user.phone || '256764496110'}" target="_blank" class="contact-customer-btn" style="display:block; text-align:center; padding:10px;">Contact Customer on WhatsApp</a>
+                </div>
+            `;
+            document.getElementById('customerDetailsModal').classList.add('active');
+        }
+        
+        function closeCustomerDetailsModal() {
+            document.getElementById('customerDetailsModal').classList.remove('active');
+        }
+        
+        function adminLogout() {
+            sessionStorage.removeItem('adminLoggedIn');
+            sessionStorage.removeItem('adminLoginTime');
+            sessionStorage.removeItem('adminUsername');
+            window.location.href = 'admin-login.html';
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCustomersTable();
+        });
+    </script>
+</body>
+</html>

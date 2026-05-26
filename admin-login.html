@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Admin Login - Fresh Wave</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0d2b1e, #2e8b57);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 25px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        .login-logo {
+            margin-bottom: 20px;
+        }
+        .login-logo img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .login-container h1 {
+            color: #2e8b57;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+        .login-container p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #2e8b57;
+        }
+        .login-btn {
+            background: #2e8b57;
+            color: white;
+            border: none;
+            padding: 14px;
+            width: 100%;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        .login-btn:hover {
+            background: #1e5a3a;
+            transform: translateY(-2px);
+        }
+        .error-msg {
+            background: #ffebee;
+            color: #d32f2f;
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #2e8b57;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .security-note {
+            margin-top: 20px;
+            font-size: 11px;
+            color: #999;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-logo">
+            <img src="Fresh logo.jpg" alt="Fresh Wave Logo" onerror="this.src='https://placehold.co/80x80/2e8b57/white?text=FW'">
+        </div>
+        <h1><i class="fas fa-chalkboard-user"></i> Admin Login</h1>
+        <p>Enter your credentials to access the admin dashboard</p>
+        
+        <div class="input-group">
+            <label><i class="fas fa-user"></i> Username</label>
+            <input type="text" id="adminUsername" placeholder="Enter admin username">
+        </div>
+        <div class="input-group">
+            <label><i class="fas fa-lock"></i> Password</label>
+            <input type="password" id="adminPassword" placeholder="Enter admin password">
+        </div>
+        
+        <button class="login-btn" onclick="adminLogin()"><i class="fas fa-sign-in-alt"></i> Login to Admin Panel</button>
+        <div id="loginError"></div>
+        <a href="index.html" class="back-link">← Back to Customer Shop</a>
+        <div class="security-note">
+            <i class="fas fa-shield-alt"></i> Secure Admin Access - Authorized Personnel Only
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <script>
+        // CHANGE THESE TO YOUR SECURE CREDENTIALS
+        const ADMIN_USERNAME = "freshwaveadmin";
+        const ADMIN_PASSWORD = "12345678";
+        
+        function adminLogin() {
+            const username = document.getElementById('adminUsername').value.trim();
+            const password = document.getElementById('adminPassword').value;
+            
+            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+                // Set session to remember admin is logged in
+                sessionStorage.setItem('adminLoggedIn', 'true');
+                sessionStorage.setItem('adminLoginTime', new Date().getTime());
+                sessionStorage.setItem('adminUsername', username);
+                window.location.href = 'admin.html';
+            } else {
+                document.getElementById('loginError').innerHTML = '<div class="error-msg"><i class="fas fa-exclamation-circle"></i> Invalid username or password. Access denied.</div>';
+            }
+        }
+        
+        // Check if already logged in
+        if (sessionStorage.getItem('adminLoggedIn') === 'true') {
+            const loginTime = parseInt(sessionStorage.getItem('adminLoginTime'));
+            const hoursSince = (new Date().getTime() - loginTime) / (1000 * 60 * 60);
+            if (hoursSince < 8) {
+                window.location.href = 'admin.html';
+            } else {
+                sessionStorage.removeItem('adminLoggedIn');
+                sessionStorage.removeItem('adminLoginTime');
+            }
+        }
+        
+        // Enter key support
+        document.getElementById('adminPassword').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') adminLogin();
+        });
+    </script>
+</body>
+</html>
