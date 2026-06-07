@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Fresh Wave</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+        }
+        .admin-nav {
+            background: white;
+            padding: 15px 0;
+            border-bottom: 1px solid #e0e0e0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .admin-nav ul {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+        .admin-nav a {
+            text-decoration: none;
+            color: #333;
+            padding: 8px 25px;
+            border-radius: 30px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .admin-nav a:hover, .admin-nav a.active {
+            background: #2e8b57;
+            color: white;
+        }
+        .logout-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 8px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        .stat-card i {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        .stat-card h2 {
+            font-size: 28px;
+            margin: 10px 0;
+            color: #2e8b57;
+        }
+        .chart-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        .chart-container {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .chart-container h3 {
+            margin-bottom: 20px;
+            border-left: 4px solid #2e8b57;
+            padding-left: 15px;
+        }
+        .full-width-chart {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .recent-orders {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        .export-section {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        .export-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        .export-btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s;
+        }
+        .export-btn.excel { background: #1F7B4D; color: white; }
+        .export-btn.csv { background: #2E86C1; color: white; }
+        .export-btn.access { background: #A569BD; color: white; }
+        .export-btn.json { background: #F39C12; color: white; }
+        .export-btn.pdf { background: #E74C3C; color: white; }
+        .export-btn:hover { transform: translateY(-2px); }
+        
+        /* Delivery Personnel Styles */
+        .delivery-personnel-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .delivery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .rider-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            border-left: 4px solid #2e8b57;
+            transition: all 0.3s;
+        }
+        .rider-card.active {
+            border-left-color: #ff6b6b;
+            background: #fff5f5;
+        }
+        .rider-name {
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .rider-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        .status-available { background: #2e8b57; color: white; }
+        .status-busy { background: #ff6b6b; color: white; }
+        .status-delivering { background: #ff9800; color: white; }
+        .live-map {
+            height: 400px;
+            background: #e8f5e9;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .map-overlay {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            z-index: 10;
+            font-size: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .rider-location-marker {
+            position: absolute;
+            background: #ff6b6b;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: bold;
+            white-space: nowrap;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.8; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        .tracking-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        .tracking-controls input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+        }
+        .btn-primary {
+            background: #2e8b57;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .btn-warning {
+            background: #ff9800;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .btn-danger {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background: #f8f9fa;
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        .status-confirmed { background: #2196F3; color: white; }
+        .status-preparing { background: #ff9800; color: white; }
+        .status-onway { background: #ff6b6b; color: white; }
+        .status-delivered { background: #2e8b57; color: white; }
+        .status-cancelled { background: #999; color: white; }
+        .btn {
+            background: #2e8b57;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+        }
+        .admin-header {
+            background: linear-gradient(135deg, #1a3c2a, #2e8b57);
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+        }
+        @media (max-width: 768px) {
+            .chart-row { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .delivery-grid { grid-template-columns: 1fr; }
+            .rider-location-marker { font-size: 10px; padding: 4px 8px; }
+        }
+    </style>
+</head>
+<body>
+
+    <script>
+        if (sessionStorage.getItem('adminLoggedIn') !== 'true') {
+            window.location.href = 'admin-login.html';
+        }
+        
+        if ("Notification" in window) {
+            Notification.requestPermission();
+        }
+    </script>
+
+    <div class="admin-nav">
+        <div class="container">
+            <ul>
+                <li><a onclick="showDashboard()" class="active" id="navDashboard">📊 Dashboard</a></li>
+                <li><a onclick="showOrders()" id="navOrders">📦 Orders</a></li>
+                <li><a onclick="showDeliveryTracking()" id="navTracking">🚚 Live Tracking</a></li>
+                <li><a onclick="showCustomers()" id="navCustomers">👥 Customers</a></li>
+                <li><a onclick="showStats()" id="navStats">📈 Statistics</a></li>
+                <li><button class="logout-btn" onclick="adminLogout()">🚪 Logout</button></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="admin-header">
+        <div class="container">
+            <h1><i class="fas fa-chalkboard-user"></i> Admin Dashboard</h1>
+            <p>Welcome back, <span id="adminName">Admin</span>! Monitor deliveries in real-time</p>
+        </div>
+    </div>
+
+    <div class="container" id="mainContent"></div>
+
+    <script>
+        // Delivery Personnel Database
+        let deliveryPersonnel = JSON.parse(localStorage.getItem('deliveryPersonnel') || JSON.stringify([
+            { id: 1, name: "John Mukasa", phone: "0772345678", vehicleType: "Motorcycle", plateNumber: "UBC 123M", status: "available", currentOrder: null, lat: 0.347596, lng: 32.582520, lastUpdate: new Date().toISOString() },
+            { id: 2, name: "Sarah Namirembe", phone: "0789456123", vehicleType: "Bicycle", plateNumber: "UBG 456K", status: "delivering", currentOrder: "ORD-12345", lat: 0.340000, lng: 32.575000, lastUpdate: new Date().toISOString() },
+            { id: 3, name: "Peter Wasswa", phone: "0756123789", vehicleType: "Motorcycle", plateNumber: "UBA 789L", status: "busy", currentOrder: "ORD-12346", lat: 0.355000, lng: 32.590000, lastUpdate: new Date().toISOString() }
+        ]));
+        
+        function getOrders() { return JSON.parse(localStorage.getItem('all_orders') || '[]'); }
+        function getUsers() { return JSON.parse(localStorage.getItem('users') || '[]'); }
+        function saveOrders(orders) { localStorage.setItem('all_orders', JSON.stringify(orders)); }
+        function saveDeliveryPersonnel() { localStorage.setItem('deliveryPersonnel', JSON.stringify(deliveryPersonnel)); }
+        
+        document.getElementById('adminName').innerHTML = sessionStorage.getItem('adminUsername') || 'Admin';
+        
+        // Simulate live location updates for riders
+        let trackingInterval;
+        
+        function startLiveTracking() {
+            if (trackingInterval) clearInterval(trackingInterval);
+            trackingInterval = setInterval(() => {
+                // Simulate rider movement for active deliveries
+                deliveryPersonnel.forEach(rider => {
+                    if (rider.status === 'delivering') {
+                        // Random movement within Kampala area
+                        rider.lat += (Math.random() - 0.5) * 0.002;
+                        rider.lng += (Math.random() - 0.5) * 0.002;
+                        rider.lastUpdate = new Date().toISOString();
+                        
+                        // Check if reached destination (simulated)
+                        const orders = getOrders();
+                        const order = orders.find(o => o.orderNumber === rider.currentOrder);
+                        if (order && Math.random() < 0.05) {
+                            // Simulate delivery completion
+                            rider.status = 'available';
+                            rider.currentOrder = null;
+                            updateOrderStatus(rider.currentOrder, 'delivered');
+                            showNotification(`Order ${rider.currentOrder} delivered by ${rider.name}!`, 'success');
+                        }
+                    }
+                });
+                saveDeliveryPersonnel();
+                if (document.getElementById('deliveryTrackingSection')?.style.display !== 'none') {
+                    updateLiveMap();
+                }
+            }, 5000);
+        }
+        
+        function updateLiveMap() {
+            const mapContainer = document.getElementById('liveMapContainer');
+            if (!mapContainer) return;
+            
+            // Kampala center coordinates
+            const centerLat = 0.347596;
+            const centerLng = 32.582520;
+            
+            // Create map HTML with rider markers
+            let markersHtml = '';
+            deliveryPersonnel.forEach(rider => {
+                if (rider.status === 'delivering' || rider.status === 'busy') {
+                    const statusText = rider.status === 'delivering' ? '🚚 Delivering' : '⏳ Busy';
+                    markersHtml += `
+                        <div class="rider-location-marker" style="top: ${50 + (rider.lat - centerLat) * 5000}%; left: ${50 + (rider.lng - centerLng) * 5000}%; background: ${rider.status === 'delivering' ? '#ff6b6b' : '#ff9800'};">
+                            <i class="fas fa-motorcycle"></i> ${rider.name} - ${rider.plateNumber} - ${statusText}
+                        </div>
+                    `;
+                }
+            });
+            
+            mapContainer.innerHTML = `
+                <iframe 
+                    src="https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=Kampala,Uganda&center=${centerLat},${centerLng}&zoom=13"
+                    width="100%" 
+                    height="400" 
+                    style="border:0; border-radius:15px;" 
+                    allowfullscreen 
+                    loading="lazy">
+                </iframe>
+                <div class="map-overlay">
+                    <strong><i class="fas fa-location-dot"></i> Live Rider Locations</strong><br>
+                    ${deliveryPersonnel.filter(r => r.status !== 'available').map(r => `
+                        <div style="font-size:11px; margin-top:5px;">
+                            🏍️ ${r.name}: ${r.plateNumber} - ${r.status === 'delivering' ? 'On Delivery' : 'Busy'}
+                        </div>
+                    `).join('') || 'No active deliveries'}
+                </div>
+            `;
+        }
+        
+        // ========== DELIVERY TRACKING PAGE ==========
+        function showDeliveryTracking() {
+            const orders = getOrders();
+            const activeDeliveries = orders.filter(o => o.status === 'onway' || o.status === 'preparing');
+            
+            document.getElementById('mainContent').innerHTML = `
+                <!-- Live Tracking Map -->
+                <div class="delivery-personnel-card">
+                    <h3><i class="fas fa-map-marked-alt"></i> Live Delivery Tracking</h3>
+                    <p>Real-time location of all delivery riders on map</p>
+                    <div id="liveMapContainer" class="live-map" style="height: 450px; position: relative;">
+                        <iframe 
+                            src="https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=Kampala,Uganda&zoom=13"
+                            width="100%" 
+                            height="100%" 
+                            style="border:0; border-radius:15px;" 
+                            allowfullscreen 
+                            loading="lazy">
+                        </iframe>
+                    </div>
+                </div>
+                
+                <!-- Delivery Personnel Management -->
+                <div class="delivery-personnel-card">
+                    <h3><i class="fas fa-truck-fast"></i> Delivery Personnel Management</h3>
+                    <div style="margin-bottom: 15px;">
+                        <button class="btn-primary" onclick="addDeliveryPerson()"><i class="fas fa-plus"></i> Add Rider</button>
+                    </div>
+                    <div class="delivery-grid" id="deliveryPersonnelGrid"></div>
+                </div>
+                
+                <!-- Assign Delivery to Order -->
+                <div class="delivery-personnel-card">
+                    <h3><i class="fas fa-clipboard-list"></i> Assign Delivery to Order</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <label>Select Order</label>
+                            <select id="assignOrderSelect" class="form-control" style="width:100%; padding:10px; margin-top:5px; border-radius:10px; border:1px solid #ddd;">
+                                <option value="">-- Select Order --</option>
+                                ${orders.filter(o => o.status === 'confirmed' || o.status === 'preparing').map(o => `
+                                    <option value="${o.orderNumber}">${o.orderNumber} - UGX ${(o.total||0).toLocaleString()} - ${o.address?.substring(0,30)}...</option>
+                                `).join('')}
+                            </select>
+                        </div>
+                        <div>
+                            <label>Select Rider</label>
+                            <select id="assignRiderSelect" style="width:100%; padding:10px; margin-top:5px; border-radius:10px; border:1px solid #ddd;">
+                                <option value="">-- Select Rider --</option>
+                                ${deliveryPersonnel.filter(r => r.status === 'available').map(r => `
+                                    <option value="${r.id}">${r.name} - ${r.plateNumber} - ${r.vehicleType}</option>
+                                `).join('')}
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn-primary" onclick="assignDelivery()" style="margin-top: 20px; width: 100%;"><i class="fas fa-check-circle"></i> Assign Delivery</button>
+                </div>
+                
+                <!-- Active Deliveries -->
+                <div class="delivery-personnel-card">
+                    <h3><i class="fas fa-shipping-fast"></i> Active Deliveries</h3>
+                    <div style="overflow-x:auto;">
+                        <table>
+                            <thead>
+                                <tr><th>Order #</th><th>Customer</th><th>Address</th><th>Rider</th><th>Vehicle</th><th>Plate Number</th><th>Status</th><th>Action</th></tr>
+                            </thead>
+                            <tbody id="activeDeliveriesTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+            
+            updateDeliveryPersonnelGrid();
+            updateActiveDeliveriesTable();
+            updateLiveMap();
+            startLiveTracking();
+            updateActiveNav('navTracking');
+        }
+        
+        function updateDeliveryPersonnelGrid() {
+            const grid = document.getElementById('deliveryPersonnelGrid');
+            if (!grid) return;
+            
+            grid.innerHTML = deliveryPersonnel.map(rider => `
+                <div class="rider-card ${rider.status !== 'available' ? 'active' : ''}">
+                    <div class="rider-name">
+                        <i class="fas fa-user-circle" style="font-size: 24px; color: #2e8b57;"></i>
+                        ${rider.name}
+                        <span class="rider-status status-${rider.status}">${rider.status.toUpperCase()}</span>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <p><i class="fas fa-phone"></i> ${rider.phone}</p>
+                        <p><i class="fas fa-motorcycle"></i> ${rider.vehicleType}</p>
+                        <p><i class="fas fa-id-card"></i> Plate: <strong>${rider.plateNumber}</strong></p>
+                        ${rider.currentOrder ? `<p><i class="fas fa-box"></i> Order: ${rider.currentOrder}</p>` : ''}
+                        <p><i class="fas fa-clock"></i> Last Update: ${new Date(rider.lastUpdate).toLocaleTimeString()}</p>
+                    </div>
+                    <div class="tracking-controls" style="margin-top: 15px;">
+                        <select onchange="updateRiderStatus(${rider.id}, this.value)" style="flex:1; padding:8px; border-radius:10px;">
+                            <option value="available" ${rider.status === 'available' ? 'selected' : ''}>Available</option>
+                            <option value="busy" ${rider.status === 'busy' ? 'selected' : ''}>Busy</option>
+                            <option value="delivering" ${rider.status === 'delivering' ? 'selected' : ''}>Delivering</option>
+                        </select>
+                        <button class="btn-warning" onclick="showRiderLocation(${rider.id})"><i class="fas fa-map-marker-alt"></i> Track</button>
+                        <button class="btn-danger" onclick="deleteRider(${rider.id})"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function updateActiveDeliveriesTable() {
+            const table = document.getElementById('activeDeliveriesTable');
+            if (!table) return;
+            
+            const orders = getOrders();
+            const activeDeliveries = orders.filter(o => o.status === 'onway' || o.status === 'preparing' || o.status === 'confirmed');
+            const assignedDeliveries = activeDeliveries.map(order => {
+                const rider = deliveryPersonnel.find(r => r.currentOrder === order.orderNumber);
+                return { ...order, rider };
+            }).filter(d => d.rider);
+            
+            if (assignedDeliveries.length === 0) {
+                table.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:40px;">No active deliveries<td></tr>';
+                return;
+            }
+            
+            table.innerHTML = assignedDeliveries.map(d => `
+                <tr>
+                    <td><strong>${d.orderNumber}</strong></td>
+                    <td>${d.customerEmail ? d.customerEmail.split('@')[0] : 'Guest'}</td>
+                    <td style="font-size:12px;">${d.address?.substring(0, 40) || 'N/A'}...</td>
+                    <td>${d.rider?.name || 'Not assigned'}</td>
+                    <td>${d.rider?.vehicleType || '-'}</td>
+                    <td><strong>${d.rider?.plateNumber || '-'}</strong></td>
+                    <td><span class="status-badge status-${d.status}">${d.status || 'Confirmed'}</span></td>
+                    <td>
+                        <button class="btn-primary" onclick="trackRiderOnMap('${d.rider?.id}')" style="padding:5px 10px; font-size:11px;"><i class="fas fa-map-marked-alt"></i> Track Live</button>
+                        <button class="btn-warning" onclick="markAsDelivered('${d.orderNumber}')" style="padding:5px 10px; font-size:11px; margin-top:5px;"><i class="fas fa-check"></i> Complete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function updateRiderStatus(riderId, newStatus) {
+            const rider = deliveryPersonnel.find(r => r.id === riderId);
+            if (rider) {
+                rider.status = newStatus;
+                if (newStatus === 'available') {
+                    rider.currentOrder = null;
+                }
+                saveDeliveryPersonnel();
+                updateDeliveryPersonnelGrid();
+                showNotification(`${rider.name} status updated to ${newStatus}`, 'success');
+            }
+        }
+        
+        function assignDelivery() {
+            const orderNumber = document.getElementById('assignOrderSelect')?.value;
+            const riderId = document.getElementById('assignRiderSelect')?.value;
+            
+            if (!orderNumber || !riderId) {
+                showNotification('Please select both order and rider', 'error');
+                return;
+            }
+            
+            const rider = deliveryPersonnel.find(r => r.id == riderId);
+            const orders = getOrders();
+            const orderIndex = orders.findIndex(o => o.orderNumber === orderNumber);
+            
+            if (rider && orderIndex !== -1) {
+                rider.status = 'delivering';
+                rider.currentOrder = orderNumber;
+                orders[orderIndex].status = 'onway';
+                orders[orderIndex].deliveryRider = rider.name;
+                orders[orderIndex].deliveryPlate = rider.plateNumber;
+                
+                saveOrders(orders);
+                saveDeliveryPersonnel();
+                
+                // Send notification to customer
+                sendDeliveryAssignmentNotification(orderNumber, rider);
+                
+                showNotification(`Order ${orderNumber} assigned to ${rider.name} (${rider.plateNumber})`, 'success');
+                showDeliveryTracking();
+            }
+        }
+        
+        function sendDeliveryAssignmentNotification(orderNumber, rider) {
+            const orders = getOrders();
+            const order = orders.find(o => o.orderNumber === orderNumber);
+            if (order && order.customerEmail) {
+                const customer = getUsers().find(u => u.email === order.customerEmail);
+                if (customer?.phone) {
+                    const message = `🚚 *Your order #${orderNumber} is on the way!*
+
+👨‍🛵 Rider: ${rider.name}
+📱 Contact: ${rider.phone}
+🏍️ Vehicle: ${rider.vehicleType}
+🔢 Plate Number: ${rider.plateNumber}
+
+📍 Track your delivery live in your dashboard!
+
+Fresh Wave Uganda`;
+                    window.open(`https://wa.me/${customer.phone.replace(/^0/, '256')}?text=${encodeURIComponent(message)}`, '_blank');
+                }
+            }
+        }
+        
+        function trackRiderOnMap(riderId) {
+            const rider = deliveryPersonnel.find(r => r.id == riderId);
+            if (rider) {
+                const mapUrl = `https://www.google.com/maps/search/?api=1&query=${rider.lat},${rider.lng}`;
+                window.open(mapUrl, '_blank');
+                showNotification(`Tracking ${rider.name} on Google Maps`, 'info');
+            }
+        }
+        
+        function showRiderLocation(riderId) {
+            trackRiderOnMap(riderId);
+        }
+        
+        function markAsDelivered(orderNumber) {
+            if (confirm(`Mark order ${orderNumber} as delivered?`)) {
+                updateOrderStatus(orderNumber, 'delivered');
+                const rider = deliveryPersonnel.find(r => r.currentOrder === orderNumber);
+                if (rider) {
+                    rider.status = 'available';
+                    rider.currentOrder = null;
+                    saveDeliveryPersonnel();
+                }
+                showDeliveryTracking();
+            }
+        }
+        
+        function addDeliveryPerson() {
+            const name = prompt('Enter rider name:');
+            const phone = prompt('Enter phone number:');
+            const vehicleType = prompt('Enter vehicle type (Motorcycle/Bicycle/Car):');
+            const plateNumber = prompt('Enter vehicle plate number:');
+            
+            if (name && phone && vehicleType && plateNumber) {
+                const newId = Math.max(...deliveryPersonnel.map(r => r.id), 0) + 1;
+                deliveryPersonnel.push({
+                    id: newId, name, phone, vehicleType, plateNumber,
+                    status: 'available', currentOrder: null,
+                    lat: 0.347596, lng: 0.582520, lastUpdate: new Date().toISOString()
+                });
+                saveDeliveryPersonnel();
+                updateDeliveryPersonnelGrid();
+                showNotification(`${name} added to delivery team!`, 'success');
+            }
+        }
+        
+        function deleteRider(riderId) {
+            if (confirm('Remove this rider from the system?')) {
+                deliveryPersonnel = deliveryPersonnel.filter(r => r.id !== riderId);
+                saveDeliveryPersonnel();
+                updateDeliveryPersonnelGrid();
+                showNotification('Rider removed', 'success');
+            }
+        }
+        
+        // ========== DASHBOARD WITH GRAPHS ==========
+        function showDashboard() {
+            const orders = getOrders();
+            const users = getUsers();
+            const totalRevenue = orders.filter(o => o.status !== 'cancelled').reduce((s, o) => s + (o.total || 0), 0);
+            const pendingOrders = orders.filter(o => o.status === 'confirmed' || o.status === 'preparing').length;
+            const deliveredOrders = orders.filter(o => o.status === 'delivered').length;
+            const activeRiders = deliveryPersonnel.filter(r => r.status !== 'available').length;
+            
+            const statusCounts = {
+                confirmed: orders.filter(o => o.status === 'confirmed').length,
+                preparing: orders.filter(o => o.status === 'preparing').length,
+                onway: orders.filter(o => o.status === 'onway').length,
+                delivered: deliveredOrders,
+                cancelled: orders.filter(o => o.status === 'cancelled').length
+            };
+            
+            const dailyRevenue = {};
+            orders.forEach(order => {
+                if (order.status !== 'cancelled' && order.date) {
+                    const date = order.date.split(',')[0];
+                    dailyRevenue[date] = (dailyRevenue[date] || 0) + (order.total || 0);
+                }
+            });
+            const sortedDates = Object.keys(dailyRevenue).sort().slice(-7);
+            const revenueData = sortedDates.map(d => dailyRevenue[d]);
+            
+            const recentOrders = [...orders].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0,5);
+            
+            document.getElementById('mainContent').innerHTML = `
+                <div class="stats-grid">
+                    <div class="stat-card"><i class="fas fa-shopping-cart" style="color:#2196F3"></i><h2>${orders.length}</h2><p>Total Orders</p></div>
+                    <div class="stat-card"><i class="fas fa-clock" style="color:#ff9800"></i><h2>${pendingOrders}</h2><p>Pending Orders</p></div>
+                    <div class="stat-card"><i class="fas fa-check-circle" style="color:#2e8b57"></i><h2>${deliveredOrders}</h2><p>Delivered</p></div>
+                    <div class="stat-card"><i class="fas fa-chart-line" style="color:#2e8b57"></i><h2>UGX ${totalRevenue.toLocaleString()}</h2><p>Total Revenue</p></div>
+                    <div class="stat-card"><i class="fas fa-users" style="color:#9C27B0"></i><h2>${users.length}</h2><p>Customers</p></div>
+                    <div class="stat-card"><i class="fas fa-truck" style="color:#ff6b6b"></i><h2>${activeRiders}</h2><p>Active Riders</p></div>
+                </div>
+                
+                <div class="export-section">
+                    <h3><i class="fas fa-download"></i> Export Data</h3>
+                    <div class="export-buttons">
+                        <button class="export-btn excel" onclick="exportToExcel()"><i class="fas fa-file-excel"></i> Excel</button>
+                        <button class="export-btn csv" onclick="exportToCSV()"><i class="fas fa-file-csv"></i> CSV</button>
+                        <button class="export-btn access" onclick="exportToAccess()"><i class="fas fa-database"></i> Access</button>
+                        <button class="export-btn pdf" onclick="exportToPDF()"><i class="fas fa-file-pdf"></i> PDF Report</button>
+                    </div>
+                </div>
+                
+                <div class="chart-row">
+                    <div class="chart-container">
+                        <h3><i class="fas fa-chart-line"></i> Revenue Trend (Last 7 Days)</h3>
+                        <canvas id="revenueTrendChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3><i class="fas fa-chart-pie"></i> Orders by Status</h3>
+                        <canvas id="statusPieChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="recent-orders">
+                    <h3><i class="fas fa-clock"></i> Recent Orders</h3>
+                    ${recentOrders.length === 0 ? '<p>No orders yet</p>' : `
+                        <table>
+                            <thead><tr><th>Order #</th><th>Customer</th><th>Date</th><th>Total</th><th>Status</th><th>Rider</th><th>Plate</th></tr></thead>
+                            <tbody>
+                                ${recentOrders.map(o => `
+                                    <tr>
+                                        <td>${o.orderNumber}</td>
+                                        <td>${o.customerEmail ? o.customerEmail.split('@')[0] : 'Guest'}</td>
+                                        <td>${o.date}</td>
+                                        <td>UGX ${(o.total || 0).toLocaleString()}</td>
+                                        <td><span class="status-badge status-${o.status || 'confirmed'}">${o.status || 'Confirmed'}</span></td>
+                                        <td>${o.deliveryRider || '-'}</td>
+                                        <td>${o.deliveryPlate || '-'}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    `}
+                    <button class="btn" onclick="showOrders()" style="margin-top:15px;">View All Orders →</button>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                const ctx1 = document.getElementById('revenueTrendChart')?.getContext('2d');
+                if (ctx1) new Chart(ctx1, { type: 'line', data: { labels: sortedDates, datasets: [{ label: 'Revenue (UGX)', data: revenueData, borderColor: '#2e8b57', fill: true }] }, options: { responsive: true } });
+                const ctx2 = document.getElementById('statusPieChart')?.getContext('2d');
+                if (ctx2) new Chart(ctx2, { type: 'doughnut', data: { labels: ['Confirmed', 'Preparing', 'On Way', 'Delivered', 'Cancelled'], datasets: [{ data: [statusCounts.confirmed, statusCounts.preparing, statusCounts.onway, statusCounts.delivered, statusCounts.cancelled], backgroundColor: ['#2196F3', '#ff9800', '#ff6b6b', '#2e8b57', '#999'] }] } });
+            }, 100);
+            
+            updateActiveNav('navDashboard');
+        }
+        
+        // ========== ORDERS MANAGEMENT ==========
+        function showOrders() {
+            const orders = getOrders();
+            document.getElementById('mainContent').innerHTML = `
+                <div class="full-width-chart">
+                    <h3><i class="fas fa-clipboard-list"></i> All Orders</h3>
+                    <div style="overflow-x:auto">
+                        <table>
+                            <thead><tr><th>Order #</th><th>Customer</th><th>Date</th><th>Total</th><th>Payment</th><th>Status</th><th>Rider</th><th>Plate</th><th>Update</th></tr></thead>
+                            <tbody>
+                                ${orders.length === 0 ? '<tr><td colspan="9">No orders yet</td></tr>' : 
+                                    orders.sort((a,b)=>new Date(b.date)-new Date(a.date)).map(o => `
+                                        <tr>
+                                            <td>${o.orderNumber}</td>
+                                            <td>${o.customerEmail ? o.customerEmail.split('@')[0] : 'Guest'}</td>
+                                            <td>${o.date}</td>
+                                            <td>UGX ${(o.total||0).toLocaleString()}</td>
+                                            <td>${o.paymentMethod || 'N/A'}</td>
+                                            <td><span class="status-badge status-${o.status||'confirmed'}">${o.status||'Confirmed'}</span></td>
+                                            <td>${o.deliveryRider || '-'}</td>
+                                            <td>${o.deliveryPlate || '-'}</td>
+                                            <td><select onchange="updateOrderStatus('${o.orderNumber}', this.value)"><option value="confirmed" ${o.status==='confirmed'?'selected':''}>Confirmed</option><option value="preparing" ${o.status==='preparing'?'selected':''}>Preparing</option><option value="onway" ${o.status==='onway'?'selected':''}>On The Way</option><option value="delivered" ${o.status==='delivered'?'selected':''}>Delivered</option><option value="cancelled" ${o.status==='cancelled'?'selected':''}>Cancelled</option></select></td>
+                                        </tr>
+                                    `).join('')
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+            updateActiveNav('navOrders');
+        }
+        
+        function showCustomers() {
+            const users = getUsers();
+            document.getElementById('mainContent').innerHTML = `
+                <div class="full-width-chart">
+                    <h3><i class="fas fa-users"></i> All Customers</h3>
+                    <div style="overflow-x:auto">
+                        <table>
+                            <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Orders</th><th>Total Spent</th></tr></thead>
+                            <tbody>
+                                ${users.length === 0 ? '<tr><td colspan="5">No customers yet</td></tr>' :
+                                    users.map(u => {
+                                        const userOrders = getOrders().filter(o => o.customerEmail === u.email);
+                                        const totalSpent = userOrders.reduce((s, o) => s + (o.total || 0), 0);
+                                        return `<tr><td><strong>${u.name}</strong></td><td>${u.email}</td><td>${u.phone || 'N/A'}</td><td>${userOrders.length}</td><td>UGX ${totalSpent.toLocaleString()}</td></tr>`;
+                                    }).join('')
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+            updateActiveNav('navCustomers');
+        }
+        
+        function showStats() { showDashboard(); updateActiveNav('navStats'); }
+        
+        function updateOrderStatus(orderNumber, newStatus) {
+            let orders = getOrders();
+            const orderIndex = orders.findIndex(o => o.orderNumber === orderNumber);
+            if (orderIndex !== -1) {
+                orders[orderIndex].status = newStatus;
+                saveOrders(orders);
+                
+                const customerEmail = orders[orderIndex].customerEmail;
+                if (customerEmail) {
+                    let customerOrders = JSON.parse(localStorage.getItem(`orders_${customerEmail}`) || '[]');
+                    const coIndex = customerOrders.findIndex(o => o.orderNumber === orderNumber);
+                    if (coIndex !== -1) {
+                        customerOrders[coIndex].status = newStatus;
+                        localStorage.setItem(`orders_${customerEmail}`, JSON.stringify(customerOrders));
+                    }
+                }
+                
+                showNotification(`Order #${orderNumber} updated to ${newStatus}`, 'success');
+                showOrders();
+            }
+        }
+        
+        // Export Functions
+        function exportToExcel() {
+            const orders = getOrders();
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(orders.map(o => ({ 'Order #': o.orderNumber, 'Date': o.date, 'Customer': o.customerEmail, 'Total': o.total, 'Status': o.status, 'Rider': o.deliveryRider || '-', 'Plate': o.deliveryPlate || '-' }))), 'Orders');
+            XLSX.writeFile(wb, `FreshWave_Export_${new Date().toISOString().slice(0,10)}.xlsx`);
+            showNotification('Excel exported!', 'success');
+        }
+        
+        function exportToCSV() {
+            const orders = getOrders();
+            let csv = 'Order Number,Date,Customer,Total,Status,Rider,Plate\n';
+            orders.forEach(o => { csv += `"${o.orderNumber}","${o.date}","${o.customerEmail || 'Guest'}","${o.total || 0}","${o.status || 'Confirmed'}","${o.deliveryRider || '-'}","${o.deliveryPlate || '-'}"\n`; });
+            downloadFile(csv, `FreshWave_Orders_${new Date().toISOString().slice(0,10)}.csv`, 'text/csv');
+        }
+        
+        function exportToAccess() {
+            const orders = getOrders();
+            let xml = `<?xml version="1.0"?><dataroot>`;
+            orders.forEach(o => { xml += `<Order><OrderNumber>${o.orderNumber}</OrderNumber><Date>${o.date}</Date><Customer>${o.customerEmail}</Customer><Total>${o.total}</Total><Status>${o.status}</Status><Rider>${o.deliveryRider || ''}</Rider><Plate>${o.deliveryPlate || ''}</Plate></Order>`; });
+            xml += `</dataroot>`;
+            downloadFile(xml, `FreshWave_Access_${new Date().toISOString().slice(0,10)}.xml`, 'application/xml');
+        }
+        
+        function exportToPDF() {
+            const orders = getOrders();
+            const win = window.open('', '_blank');
+            win.document.write(`<html><head><title>Fresh Wave Report</title><style>body{font-family:Arial;padding:20px}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8px}th{background:#2e8b57;color:white}</style></head><body><h1>Fresh Wave - Business Report</h1><p>Generated: ${new Date().toLocaleString()}</p><h2>Orders (${orders.length})</h2><table><tr><th>Order #</th><th>Date</th><th>Customer</th><th>Total</th><th>Status</th><th>Rider</th><th>Plate</th></tr>${orders.map(o => `<tr><td>${o.orderNumber}</td><td>${o.date}</td><td>${o.customerEmail || 'Guest'}</td><td>UGX ${(o.total||0).toLocaleString()}</td><td>${o.status||'Confirmed'}</td><td>${o.deliveryRider || '-'}</td><td>${o.deliveryPlate || '-'}</td></tr>`).join('')}</table></body></html>`);
+            win.document.close();
+            win.print();
+        }
+        
+        function downloadFile(content, filename, type) {
+            const blob = new Blob([content], { type });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+        
+        function showNotification(msg, type) {
+            const n = document.createElement('div');
+            n.style.cssText = `position:fixed;bottom:20px;right:20px;background:${type === 'success' ? '#2e8b57' : '#2196F3'};color:white;padding:12px 20px;border-radius:10px;z-index:9999;animation:slideIn 0.3s ease`;
+            n.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i> ${msg}`;
+            document.body.appendChild(n);
+            setTimeout(() => n.remove(), 3000);
+        }
+        
+        function adminLogout() {
+            if (trackingInterval) clearInterval(trackingInterval);
+            sessionStorage.clear();
+            window.location.href = 'admin-login.html';
+        }
+        
+        function updateActiveNav(activeId) {
+            ['navDashboard', 'navOrders', 'navTracking', 'navCustomers', 'navStats'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.toggle('active', id === activeId);
+            });
+        }
+        
+        const style = document.createElement('style');
+        style.textContent = `@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}`;
+        document.head.appendChild(style);
+        
+        showDashboard();
+    </script>
+</body>
+</html>

@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Fresh Wave - Shop Fresh Vegetables, Fruits & Berries</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- NO AUTH CHECK HERE - ANYONE CAN BROWSE -->
+
+    <!-- TOP BAR -->
+    <div class="top-bar">
+        <div class="container">
+            <div class="contact-info">
+                <span><i class="fas fa-phone"></i> +256 745 942 209</span>
+                <span><i class="fab fa-whatsapp"></i> +256 764 496 110</span>
+                <span><i class="fas fa-clock"></i> Mon-Sat: 6AM - 8PM</span>
+            </div>
+            <div class="top-links">
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    <i class="fas fa-moon"></i> <span id="themeText">Dark</span>
+                </button>
+                <a href="#" onclick="showDashboard()"><i class="fas fa-chart-line"></i> Dashboard</a>
+                <a href="#" onclick="showSupport()"><i class="fas fa-headset"></i> Support</a>
+                <button class="ai-chat-btn" onclick="openAIChat()"><i class="fas fa-robot"></i> AI Assistant</button>
+                <a href="tel:+256745942209"><i class="fas fa-phone-alt"></i> Call to Order</a>
+                <a href="#" onclick="showLoginModal()" style="color: #ffcc00;"><i class="fas fa-sign-in-alt"></i> Login</a>
+                <a href="#" onclick="showRegisterModal()" style="color: #4CAF50;"><i class="fas fa-user-plus"></i> Register</a>
+                <a href="#" onclick="logout()" id="logoutLink" style="color: #ff6b6b; display: none;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <header>
+        <div class="container">
+            <div class="logo-container">
+                <img src="Fresh logo.jpg" alt="Fresh Wave Logo" class="logo" onerror="this.src='https://placehold.co/80x80/2e8b57/white?text=FW'">
+                <div class="logo-text">
+                    <h1>Fresh Wave</h1>
+                    <p>Quality Vegetables, Fruits & Berries at Your Door</p>
+                </div>
+            </div>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search tomatoes, strawberries, mangoes..." onkeyup="searchProducts()">
+                <button onclick="searchProducts()"><i class="fas fa-search"></i></button>
+            </div>
+            <div class="header-actions">
+                <div class="user-dropdown-container">
+                    <button class="user-btn" onclick="toggleUserMenu()">
+                        <i class="fas fa-user-circle"></i>
+                        <span id="userNameDisplay">Account</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="user-menu" id="userMenu">
+                        <div class="user-info" id="userInfoSection">
+                            <p>Welcome to Fresh Wave!</p>
+                            <button onclick="showLoginModal()"><i class="fas fa-sign-in-alt"></i> Login</button>
+                            <button onclick="showRegisterModal()"><i class="fas fa-user-plus"></i> Register</button>
+                        </div>
+                        <div class="user-links" id="userLinksSection" style="display:none;">
+                            <a href="#" onclick="showDashboard()"><i class="fas fa-chart-line"></i> Dashboard</a>
+                            <a href="#" onclick="showProfile()"><i class="fas fa-user"></i> My Profile</a>
+                            <a href="#" onclick="showWishlist()"><i class="fas fa-heart"></i> Wishlist <span id="wishlistCount" class="badge">0</span></a>
+                            <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="cart-icon-container">
+                    <button class="cart-btn" onclick="toggleCart()">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-badge" id="cartCount">0</span>
+                    </button>
+                    <div class="cart-dropdown" id="cartDropdown">
+                        <h4><i class="fas fa-shopping-cart"></i> My Cart</h4>
+                        <div id="cartItems" class="cart-items"></div>
+                        <div class="cart-footer">
+                            <div class="cart-total"><strong>Total:</strong> UGX <span id="cartTotal">0</span></div>
+                            <div class="min-order-progress">
+                                <div class="progress-bar"><div class="progress-fill" id="minOrderFill" style="width:0%"></div></div>
+                                <small id="minOrderMessage">Add UGX 10,000 more for delivery</small>
+                            </div>
+                            <button class="checkout-btn" onclick="goToCheckout()"><i class="fas fa-credit-card"></i> Proceed to Checkout</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="container">
+            <ul>
+                <li><a href="#" onclick="showHome()" class="active" id="navHome">🏠 Home</a></li>
+                <li><a href="#" onclick="showProducts()" id="navShop">🛒 Shop</a></li>
+                <li><a href="#" onclick="showFlashSale()" id="navFlashSale">⚡ Flash Sale</a></li>
+                <li><a href="#" onclick="showGallery()" id="navGallery">📷 Gallery</a></li>
+                <li><a href="#" onclick="showPrices()" id="navPrices">💰 Prices</a></li>
+                <li><a href="#" onclick="showDelivery()" id="navDelivery">🚚 Delivery</a></li>
+                <li><a href="#" onclick="showTracking()" id="navTracking">📍 Track Order</a></li>
+                <li><a href="#" onclick="showDashboard()" id="navDashboard">📊 Dashboard</a></li>
+                <li><a href="#" onclick="showTerms()" id="navTerms">📜 Terms</a></li>
+                <li><a href="#" onclick="showFAQ()" id="navFAQ">❓ FAQ</a></li>
+                <li><a href="#" onclick="showSupport()" id="navSupport">📞 Support</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main id="mainContent">
+        <!-- HOME SECTION -->
+        <div id="homeSection">
+            <section class="hero">
+                <div class="hero-slideshow" id="heroSlideshow"></div>
+                <div class="container">
+                    <div class="hero-content">
+                        <h2>Fresh Produce Delivered to Your Doorstep</h2>
+                        <p>Farm-fresh vegetables, exotic fruits, and premium berries delivered within 1-2 hours in Kampala</p>
+                        <div class="hero-buttons">
+                            <button onclick="showProducts()" class="btn-primary">Shop Now <i class="fas fa-arrow-right"></i></button>
+                            <button onclick="showDashboard()" class="btn-secondary">View Dashboard <i class="fas fa-chart-line"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="quick-links">
+                <div class="container">
+                    <h2><i class="fas fa-bolt"></i> Shop by Category</h2>
+                    <div class="quick-links-grid">
+                        <div class="quick-link-card" onclick="filterByCategory('vegetables')"><i class="fas fa-carrot"></i><span>Vegetables</span></div>
+                        <div class="quick-link-card" onclick="filterByCategory('fruits')"><i class="fas fa-apple-alt"></i><span>Fruits</span></div>
+                        <div class="quick-link-card" onclick="filterByCategory('berries')"><i class="fas fa-strawberry"></i><span>Berries</span></div>
+                        <div class="quick-link-card" onclick="filterByCategory('root')"><i class="fas fa-potato"></i><span>Root Veggies</span></div>
+                        <div class="quick-link-card" onclick="filterByCategory('all')"><i class="fas fa-th-large"></i><span>All Products</span></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="features">
+                <div class="container">
+                    <div class="features-grid">
+                        <div class="feature"><i class="fas fa-truck-fast"></i><h4>Free Delivery</h4><p>On orders over UGX 50,000</p></div>
+                        <div class="feature"><i class="fas fa-clock"></i><h4>1-2 Hour Delivery</h4><p>Fast & reliable</p></div>
+                        <div class="feature"><i class="fas fa-leaf"></i><h4>100% Fresh</h4><p>Quality guaranteed</p></div>
+                        <div class="feature"><i class="fas fa-shield-alt"></i><h4>Secure Payments</h4><p>Airtel Money, MTN MoMo</p></div>
+                        <div class="feature"><i class="fas fa-headset"></i><h4>24/7 Support</h4><p>Chat with us anytime</p></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FLASH SALE SECTION -->
+            <section class="flash-sale" id="flashSaleSection">
+                <div class="container">
+                    <div class="sale-header">
+                        <h2><i class="fas fa-bolt"></i> FLASH SALE - 24 HOURS ONLY!</h2>
+                        <div class="countdown">
+                            <div class="time-box"><span id="hours">23</span><label>Hours</label></div>
+                            <div class="time-box"><span id="minutes">59</span><label>Mins</label></div>
+                            <div class="time-box"><span id="seconds">45</span><label>Secs</label></div>
+                        </div>
+                    </div>
+                    <div class="sale-products" id="saleProducts"></div>
+                </div>
+            </section>
+        </div>
+
+        <!-- PRODUCTS SECTION -->
+        <div id="productsSection" style="display:none;">
+            <section id="products">
+                <div class="container">
+                    <h2>All Fresh Produce</h2>
+                    <div class="category-tabs">
+                        <button class="category-tab active" onclick="filterByCategory('all')">All Products</button>
+                        <button class="category-tab" onclick="filterByCategory('vegetables')">Vegetables</button>
+                        <button class="category-tab" onclick="filterByCategory('fruits')">Fruits</button>
+                        <button class="category-tab" onclick="filterByCategory('berries')">Berries</button>
+                        <button class="category-tab" onclick="filterByCategory('root')">Root Veggies</button>
+                    </div>
+                    <div class="products-layout">
+                        <aside class="filters-sidebar">
+                            <h3><i class="fas fa-filter"></i> Filters</h3>
+                            <div class="filter-group">
+                                <label>Price Range (UGX)</label>
+                                <input type="range" id="priceFilter" min="0" max="50000" step="1000" oninput="updatePriceValue()">
+                                <div class="price-values"><span>UGX 0</span><span id="priceValue">UGX 50,000</span></div>
+                            </div>
+                            <div class="filter-group">
+                                <label>Sort By</label>
+                                <select id="sortFilter" onchange="filterProducts()">
+                                    <option value="default">Default</option>
+                                    <option value="price-low">Price: Low to High</option>
+                                    <option value="price-high">Price: High to Low</option>
+                                </select>
+                            </div>
+                            <button class="clear-filters" onclick="clearFilters()">Clear Filters</button>
+                        </aside>
+                        <div class="products-grid" id="productsGrid"></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- GALLERY SECTION -->
+         
+        <div id="gallerySection" style="display:none;">
+            <div class="gallery-header">
+                <h2><i class="fas fa-images"></i> Fresh Produce Gallery</h2>
+                <div class="gallery-filters">
+                    <button class="gallery-filter-btn active" onclick="filterGallery('all')">All</button>
+                    <button class="gallery-filter-btn" onclick="filterGallery('vegetables')">Vegetables</button>
+                    <button class="gallery-filter-btn" onclick="filterGallery('fruits')">Fruits</button>
+                    <button class="gallery-filter-btn" onclick="filterGallery('berries')">Berries</button>
+                    <button class="gallery-filter-btn" onclick="filterGallery('root')">Root Veggies</button>
+                </div>
+            </div>
+            <section id="gallery">
+                <div class="container">
+                    <h2><i class="fas fa-images"></i> Fresh Produce Gallery</h2>
+                    <div class="gallery-grid" id="galleryGrid"></div>
+                </div>
+            </section>
+        </div>
+        
+
+        <!-- PRICES SECTION -->
+        <div id="pricesSection" style="display:none;">
+            <section id="pricing">
+                <div class="container">
+                    <h2><i class="fas fa-tags"></i> Current Market Prices</h2>
+                    <div class="table-responsive">
+                        <table id="pricingTable">
+                            <thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Unit</th><th>Action</th></tr></thead>
+                            <tbody id="pricingTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- DELIVERY AREAS SECTION -->
+        <div id="deliverySection" style="display:none;">
+            <section id="delivery">
+                <div class="container">
+                    <h2><i class="fas fa-truck"></i> We Deliver To</h2>
+                    <div class="delivery-grid">
+                        <div class="delivery-area">Kampala Central</div><div class="delivery-area">Nakawa</div>
+                        <div class="delivery-area">Makindye</div><div class="delivery-area">Kawempe</div>
+                        <div class="delivery-area">Rubaga</div><div class="delivery-area">Kalerwe</div>
+                        <div class="delivery-area">Bwaise</div><div class="delivery-area">Ntinda</div>
+                        <div class="delivery-area">Kololo</div><div class="delivery-area">Naguru</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- TRACKING SECTION -->
+        <div id="trackingSection" style="display:none;">
+            <section class="tracking-section">
+                <div class="container">
+                    <h2><i class="fas fa-map-marked-alt"></i> Track Your Order</h2>
+                    <div class="tracking-card">
+                        <div class="tracking-input">
+                            <input type="text" id="trackOrderNumber" placeholder="Enter Order Number (e.g., ORD-12345)">
+                            <button onclick="trackOrderAdvanced()"><i class="fas fa-search"></i> Track Order</button>
+                        </div>
+                        <div id="trackResult" class="track-result"></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- DASHBOARD SECTION -->
+        <div id="dashboardSection" style="display:none;">
+            <section style="padding: 40px 0;">
+                <div class="container">
+                    <h2><i class="fas fa-chart-line"></i> My Dashboard</h2>
+                    <div id="dashboardContent"></div>
+                </div>
+            </section>
+        </div>
+
+        <!-- TERMS & CONDITIONS SECTION - COMPLETE DETAILED -->
+<div id="termsSection" style="display:none;">
+    <section class="terms-section">
+        <div class="container">
+            <div class="terms-container">
+                <div class="terms-header">
+                    <h1><i class="fas fa-file-contract"></i> Terms & Conditions</h1>
+                    <p>Please read these terms carefully before using Fresh Wave services</p>
+                </div>
+                <div class="terms-last-updated">
+                    <i class="fas fa-calendar-alt"></i> Last Updated: June 7, 2026 | Version 2.0
+                </div>
+
+                <!-- Table of Contents -->
+                <div class="terms-toc">
+                    <h3>Table of Contents</h3>
+                    <div class="toc-grid">
+                        <a href="#section1">1. Acceptance of Terms</a>
+                        <a href="#section2">2. Account Registration</a>
+                        <a href="#section3">3. User Eligibility</a>
+                        <a href="#section4">4. Ordering Process</a>
+                        <a href="#section5">5. Pricing and Payment</a>
+                        <a href="#section6">6. Delivery Policy</a>
+                        <a href="#section7">7. Product Quality Guarantee</a>
+                        <a href="#section8">8. Cancellation Policy</a>
+                        <a href="#section9">9. Refund Policy</a>
+                        <a href="#section10">10. User Conduct</a>
+                        <a href="#section11">11. Privacy and Data Protection</a>
+                        <a href="#section12">12. Intellectual Property</a>
+                        <a href="#section13">13. Limitation of Liability</a>
+                        <a href="#section14">14. Indemnification</a>
+                        <a href="#section15">15. Third-Party Links</a>
+                        <a href="#section16">16. Promotions and Discounts</a>
+                        <a href="#section17">17. Termination</a>
+                        <a href="#section18">18. Modifications to Terms</a>
+                        <a href="#section19">19. Governing Law</a>
+                        <a href="#section20">20. Dispute Resolution</a>
+                        <a href="#section21">21. Force Majeure</a>
+                        <a href="#section22">22. Entire Agreement</a>
+                        <a href="#section23">23. Contact Information</a>
+                    </div>
+                </div>
+
+                <!-- Section 1 -->
+                <div class="terms-block" id="section1">
+                    <h3>1. Acceptance of Terms</h3>
+                    <p>By accessing or using the Fresh Wave website, mobile application, or any of our services (collectively, the "Services"), you acknowledge that you have read, understood, and agree to be bound by these Terms and Conditions ("Terms"). If you do not agree to these Terms, please do not use our Services.</p>
+                    <p>Fresh Wave ("we," "our," "us") reserves the right to modify these Terms at any time. Your continued use of our Services following any changes constitutes your acceptance of the modified Terms.</p>
+                </div>
+
+                <!-- Section 2 -->
+                <div class="terms-block" id="section2">
+                    <h3>2. Account Registration</h3>
+                    <p>To place orders and access certain features of our Services, you must register for an account. When registering, you agree to:</p>
+                    <ul>
+                        <li>Provide accurate, current, and complete information about yourself</li>
+                        <li>Maintain the confidentiality of your account credentials</li>
+                        <li>Promptly update your account information to keep it accurate and current</li>
+                        <li>Accept full responsibility for all activities that occur under your account</li>
+                        <li>Notify us immediately of any unauthorized use of your account</li>
+                    </ul>
+                    <p>We reserve the right to suspend or terminate accounts that violate these Terms or provide false information.</p>
+                </div>
+
+                <!-- Section 3 -->
+                <div class="terms-block" id="section3">
+                    <h3>3. User Eligibility</h3>
+                    <p>By registering for an account and using our Services, you represent and warrant that:</p>
+                    <ul>
+                        <li>You are at least 18 years of age, or you are using the Services with the consent and supervision of a parent or legal guardian</li>
+                        <li>You have the legal capacity to enter into binding contracts</li>
+                        <li>You are not located in a country that is subject to government embargo or designated as a "terrorist supporting" country</li>
+                        <li>You are not listed on any government list of prohibited or restricted parties</li>
+                    </ul>
+                </div>
+
+                <!-- Section 4 -->
+                <div class="terms-block" id="section4">
+                    <h3>4. Ordering Process</h3>
+                    <p>All orders placed through our Services are subject to acceptance and availability. The ordering process involves the following steps:</p>
+                    <ul>
+                        <li><strong>Order Submission:</strong> You select products, add them to your cart, and submit your order</li>
+                        <li><strong>Order Confirmation:</strong> You will receive an email and WhatsApp confirmation with your order number</li>
+                        <li><strong>Order Acceptance:</strong> Your order is accepted when we confirm payment and begin processing</li>
+                        <li><strong>Order Rejection:</strong> We reserve the right to reject any order due to pricing errors, product unavailability, or suspected fraud</li>
+                    </ul>
+                    <p>Once your order is accepted, you will receive updates on the status of your order via WhatsApp and email.</p>
+                </div>
+
+                <!-- Section 5 -->
+                <div class="terms-block" id="section5">
+                    <h3>5. Pricing and Payment</h3>
+                    <p><strong>Pricing:</strong> All prices are displayed in Ugandan Shillings (UGX) and include applicable taxes. Prices are subject to change without notice. However, confirmed orders will be honored at the price at the time of order placement.</p>
+                    <p><strong>Payment Methods:</strong> We accept the following payment methods:</p>
+                    <ul>
+                        <li>Airtel Money (Till Number: 7104763)</li>
+                        <li>MTN Mobile Money (Merchant Number: 61967992)</li>
+                        <li>Cash on Delivery (COD)</li>
+                    </ul>
+                    <p><strong>Payment Verification:</strong> For mobile money payments, you must provide the correct transaction reference number and amount paid. Orders will not be processed until payment is verified.</p>
+                    <p><strong>Payment Security:</strong> Your PIN is entered on YOUR phone. We never ask for your PIN. All transactions are secured by your mobile network provider.</p>
+                </div>
+
+                <!-- Section 6 -->
+                <div class="terms-block" id="section6">
+                    <h3>6. Delivery Policy</h3>
+                    <p><strong>Delivery Areas:</strong> We currently deliver within Kampala Metropolitan Area including: Kampala Central, Nakawa, Makindye, Kawempe, Rubaga, Kalerwe, Bwaise, Ntinda, Kololo, and Naguru.</p>
+                    <p><strong>Delivery Time:</strong> Standard delivery takes 1-2 hours from order confirmation. Delivery times are estimates and may vary due to:</p>
+                    <ul>
+                        <li>Traffic conditions</li>
+                        <li>Weather conditions</li>
+                        <li>Order volume during peak hours</li>
+                        <li>Your specific location within the delivery zone</li>
+                    </ul>
+                    <p><strong>Delivery Fees:</strong> Free delivery on orders above UGX 50,000. A standard delivery fee of UGX 5,000 applies to orders below this amount.</p>
+                    <p><strong>Failed Deliveries:</strong> If the delivery address provided is incorrect or no one is available to receive the order after two attempts, a re-delivery fee may apply.</p>
+                    <p><strong>Delivery Acceptance:</strong> Our delivery person has the right to refuse delivery if the recipient appears intoxicated, aggressive, or if safety concerns arise.</p>
+                </div>
+
+                <!-- Section 7 -->
+                <div class="terms-block" id="section7">
+                    <h3>7. Product Quality Guarantee</h3>
+                    <p><strong>Freshness Guarantee:</strong> We guarantee that all our products are 100% fresh and of the highest quality. All products are sourced daily from local farms and trusted suppliers.</p>
+                    <p><strong>Quality Issues:</strong> If you receive any product that is damaged, spoiled, or does not meet our quality standards:</p>
+                    <ul>
+                        <li>Contact us within 2 hours of delivery</li>
+                        <li>Provide clear photos of the product</li>
+                        <li>Keep the original packaging</li>
+                        <li>Our team will review and respond within 1 hour</li>
+                    </ul>
+                    <p><strong>Resolution:</strong> For verified quality issues, we will offer:</p>
+                    <ul>
+                        <li>Replacement of the product on your next delivery, or</li>
+                        <li>Full refund for the affected items</li>
+                    </ul>
+                    <p>This guarantee does not cover products that are damaged after delivery or have been opened or consumed.</p>
+                </div>
+
+                <!-- Section 8 -->
+                <div class="terms-block" id="section8">
+                    <h3>8. Cancellation Policy</h3>
+                    <p><strong>Customer Cancellation:</strong> You may cancel your order under the following conditions:</p>
+                    <ul>
+                        <li><strong>Within 5 minutes</strong> of order placement - Full refund</li>
+                        <li><strong>Before preparation begins</strong> - Full refund</li>
+                        <li><strong>After preparation begins</strong> - Cancellation not possible</li>
+                        <li><strong>Order on the way</strong> - Cannot cancel</li>
+                    </ul>
+                    <p><strong>How to Cancel:</strong> Contact us immediately via WhatsApp at +256 764 496 110 with your order number.</p>
+                    <p><strong>Fresh Wave Cancellation:</strong> We reserve the right to cancel orders due to:</p>
+                    <ul>
+                        <li>Product unavailability</li>
+                        <li>Pricing errors</li>
+                        <li>Suspected fraudulent activity</li>
+                        <li>Inability to verify payment</li>
+                    </ul>
+                    <p>If we cancel your order, you will be notified immediately and receive a full refund.</p>
+                </div>
+
+                <!-- Section 9 -->
+                <div class="terms-block" id="section9">
+                    <h3>9. Refund Policy</h3>
+                    <p><strong>Refund Eligibility:</strong> Refunds are issued only for:</p>
+                    <ul>
+                        <li>Confirmed quality issues with products</li>
+                        <li>Orders cancelled within the allowed timeframe</li>
+                        <li>Orders cancelled by Fresh Wave due to our error</li>
+                        <li>Wrong items delivered</li>
+                    </ul>
+                    <p><strong>Refund Process:</strong></p>
+                    <ul>
+                        <li>Refund requests must be submitted within 2 hours of delivery</li>
+                        <li>Approved refunds are processed within 3-5 business days</li>
+                        <li>Refunds are issued to the original payment method</li>
+                        <li>For Cash on Delivery, refunds are issued as store credit or cash pickup</li>
+                    </ul>
+                    <p><strong>Non-Refundable Items:</strong> The following are not eligible for refund:</p>
+                    <ul>
+                        <li>Products damaged after delivery</li>
+                        <li>Products that have been opened or partially consumed</li>
+                        <li>Change of mind after delivery</li>
+                        <li>Delivery fees for orders that were successfully delivered</li>
+                    </ul>
+                </div>
+
+                <!-- Section 10 -->
+                <div class="terms-block" id="section10">
+                    <h3>10. User Conduct</h3>
+                    <p>You agree not to engage in any of the following prohibited activities:</p>
+                    <ul>
+                        <li>Using the Services for any illegal purpose or in violation of any laws</li>
+                        <li>Providing false, inaccurate, or misleading information</li>
+                        <li>Impersonating any person or entity</li>
+                        <li>Harassing, abusing, or threatening our delivery personnel or support staff</li>
+                        <li>Attempting to interfere with or compromise the security of our Services</li>
+                        <li>Uploading malicious code, viruses, or other harmful content</li>
+                        <li>Scraping, copying, or reproducing any content without permission</li>
+                        <li>Attempting to bypass any security measures</li>
+                        <li>Using multiple accounts to exploit promotions</li>
+                    </ul>
+                    <p>Violation of these provisions may result in immediate termination of your account.</p>
+                </div>
+
+                <!-- Section 11 -->
+                <div class="terms-block" id="section11">
+                    <h3>11. Privacy and Data Protection</h3>
+                    <p><strong>Information We Collect:</strong> We collect the following personal information:</p>
+                    <ul>
+                        <li>Name, email address, phone number, and delivery address</li>
+                        <li>Order history and purchase preferences</li>
+                        <li>Payment transaction information</li>
+                        <li>Communication history with our support team</li>
+                        <li>Device information and usage data</li>
+                    </ul>
+                    <p><strong>How We Use Your Information:</strong> Your information is used for:</p>
+                    <ul>
+                        <li>Processing and delivering your orders</li>
+                        <li>Communicating order status updates</li>
+                        <li>Improving our products and services</li>
+                        <li>Personalizing your experience</li>
+                        <li>Fraud prevention and security</li>
+                    </ul>
+                    <p><strong>Data Sharing:</strong> We do not sell your personal information. We may share your information with:</p>
+                    <ul>
+                        <li>Delivery partners to fulfill your order</li>
+                        <li>Payment processors to verify transactions</li>
+                        <li>Law enforcement when required by law</li>
+                    </ul>
+                    <p><strong>Data Security:</strong> We implement industry-standard security measures to protect your data. However, no method of transmission over the internet is 100% secure.</p>
+                    <p><strong>Your Rights:</strong> You have the right to:</p>
+                    <ul>
+                        <li>Access your personal data</li>
+                        <li>Request correction of inaccurate data</li>
+                        <li>Request deletion of your data</li>
+                        <li>Opt-out of marketing communications</li>
+                    </ul>
+                </div>
+
+                <!-- Section 12 -->
+                <div class="terms-block" id="section12">
+                    <h3>12. Intellectual Property</h3>
+                    <p>All content on our website and mobile application, including but not limited to:</p>
+                    <ul>
+                        <li>Logos, trademarks, and service marks</li>
+                        <li>Product images and descriptions</li>
+                        <li>Website design and layout</li>
+                        <li>Text, graphics, and icons</li>
+                        <li>Software and code</li>
+                    </ul>
+                    <p>is the property of Fresh Wave or our licensors and is protected by copyright, trademark, and other intellectual property laws.</p>
+                    <p>You may not:</p>
+                    <ul>
+                        <li>Reproduce, distribute, or modify any content without written permission</li>
+                        <li>Use our trademarks without prior written consent</li>
+                        <li>Frame or mirror any part of our website</li>
+                    </ul>
+                </div>
+
+                <!-- Section 13 -->
+                <div class="terms-block" id="section13">
+                    <h3>13. Limitation of Liability</h3>
+                    <p>To the maximum extent permitted by law, Fresh Wave shall not be liable for:</p>
+                    <ul>
+                        <li>Any indirect, incidental, special, consequential, or punitive damages</li>
+                        <li>Loss of profits, revenue, data, or business opportunities</li>
+                        <li>Damages arising from your use or inability to use our Services</li>
+                        <li>Delays or failures caused by circumstances beyond our reasonable control</li>
+                    </ul>
+                    <p>Our total liability to you for any claim arising from these Terms or your use of our Services shall not exceed the amount paid by you for the specific order in question.</p>
+                    <p>Some jurisdictions do not allow the exclusion of certain warranties or limitation of liability, so the above limitations may not apply to you.</p>
+                </div>
+
+                <!-- Section 14 -->
+                <div class="terms-block" id="section14">
+                    <h3>14. Indemnification</h3>
+                    <p>You agree to indemnify, defend, and hold harmless Fresh Wave, its officers, directors, employees, agents, and affiliates from and against any and all claims, damages, losses, liabilities, costs, and expenses (including reasonable legal fees) arising from:</p>
+                    <ul>
+                        <li>Your use of our Services</li>
+                        <li>Your violation of these Terms</li>
+                        <li>Your violation of any third-party rights</li>
+                        <li>Any content you submit or transmit through our Services</li>
+                    </ul>
+                </div>
+
+                <!-- Section 15 -->
+                <div class="terms-block" id="section15">
+                    <h3>15. Third-Party Links</h3>
+                    <p>Our Services may contain links to third-party websites or services that are not owned or controlled by Fresh Wave. We have no control over, and assume no responsibility for, the content, privacy policies, or practices of any third-party websites. You acknowledge and agree that Fresh Wave shall not be responsible or liable for any damage or loss caused by your use of any third-party content or services.</p>
+                </div>
+
+                <!-- Section 16 -->
+                <div class="terms-block" id="section16">
+                    <h3>16. Promotions and Discounts</h3>
+                    <p><strong>Discount Codes:</strong> From time to time, we may offer promotional discount codes. These codes:</p>
+                    <ul>
+                        <li>Are valid for a limited time and may expire without notice</li>
+                        <li>Cannot be combined with other offers unless specified</li>
+                        <li>Apply only to eligible products</li>
+                        <li>Have no cash value and are non-transferable</li>
+                    </ul>
+                    <p><strong>Flash Sales:</strong> Flash sale items are subject to limited quantity and time restrictions. Prices during flash sales are final and cannot be combined with other discounts.</p>
+                    <p><strong>Fraudulent Use:</strong> We reserve the right to cancel any order that uses fraudulent or inappropriately obtained discount codes.</p>
+                </div>
+
+                <!-- Section 17 -->
+                <div class="terms-block" id="section17">
+                    <h3>17. Termination</h3>
+                    <p>We may terminate or suspend your account immediately, without prior notice or liability, for any reason including:</p>
+                    <ul>
+                        <li>Violation of these Terms</li>
+                        <li>Fraudulent or abusive behavior</li>
+                        <li>Conduct harmful to our business or other users</li>
+                        <li>Inactivity for an extended period</li>
+                    </ul>
+                    <p>Upon termination:</p>
+                    <ul>
+                        <li>Your right to use our Services will cease immediately</li>
+                        <li>Any pending orders will be cancelled and refunded</li>
+                        <li>You will still be liable for any obligations incurred before termination</li>
+                    </ul>
+                    <p>You may terminate your account at any time by contacting our support team.</p>
+                </div>
+
+                <!-- Section 18 -->
+                <div class="terms-block" id="section18">
+                    <h3>18. Modifications to Terms</h3>
+                    <p>We reserve the right to modify these Terms at any time. When we make material changes, we will notify you by:</p>
+                    <ul>
+                        <li>Posting the updated Terms on our website</li>
+                        <li>Sending an email to the address associated with your account</li>
+                        <li>Providing a notice through our Services</li>
+                    </ul>
+                    <p>Your continued use of our Services after the effective date of any modifications constitutes your acceptance of the modified Terms. It is your responsibility to review these Terms periodically.</p>
+                </div>
+
+                <!-- Section 19 -->
+                <div class="terms-block" id="section19">
+                    <h3>19. Governing Law</h3>
+                    <p>These Terms shall be governed by and construed in accordance with the laws of the Republic of Uganda, without regard to its conflict of law provisions. Our failure to enforce any right or provision of these Terms shall not be considered a waiver of those rights.</p>
+                </div>
+
+                <!-- Section 20 -->
+                <div class="terms-block" id="section20">
+                    <h3>20. Dispute Resolution</h3>
+                    <p><strong>Informal Resolution:</strong> Before filing a claim, you agree to try to resolve the dispute informally by contacting us at info@freshwave.ug. We will attempt to resolve the dispute within 30 days.</p>
+                    <p><strong>Binding Arbitration:</strong> Any dispute arising from these Terms or your use of our Services that cannot be resolved informally shall be resolved through binding arbitration in Kampala, Uganda, in accordance with the Arbitration Rules of the Uganda Arbitration Association.</p>
+                    <p><strong>Exceptions:</strong> Either party may seek injunctive or other equitable relief in court to prevent actual or threatened infringement of intellectual property rights.</p>
+                </div>
+
+                <!-- Section 21 -->
+                <div class="terms-block" id="section21">
+                    <h3>21. Force Majeure</h3>
+                    <p>Fresh Wave shall not be liable for any delay or failure to perform its obligations under these Terms if such delay or failure results from circumstances beyond its reasonable control, including but not limited to:</p>
+                    <ul>
+                        <li>Acts of God, fire, flood, earthquake, or natural disaster</li>
+                        <li>War, terrorism, riot, or civil unrest</li>
+                        <li>Government actions or regulations</li>
+                        <li>Labor strikes or shortages</li>
+                        <li>Internet or telecommunications failures</li>
+                        <li>Pandemics or epidemics</li>
+                    </ul>
+                </div>
+
+                <!-- Section 22 -->
+                <div class="terms-block" id="section22">
+                    <h3>22. Entire Agreement</h3>
+                    <p>These Terms, together with our Privacy Policy, constitute the entire agreement between you and Fresh Wave regarding your use of our Services and supersede all prior agreements and understandings, whether written or oral.</p>
+                </div>
+
+                <!-- Section 23 -->
+                <div class="terms-block" id="section23">
+                    <h3>23. Contact Information</h3>
+                    <p>If you have any questions about these Terms, please contact us:</p>
+                    <ul>
+                        <li><strong>Email:</strong> info@freshwave.ug</li>
+                        <li><strong>Phone:</strong> +256 745 942 209</li>
+                        <li><strong>WhatsApp:</strong> +256 764 496 110</li>
+                        <li><strong>Address:</strong> Opposite Kalerwe Market, Kampala, Uganda</li>
+                        <li><strong>Business Hours:</strong> Monday - Saturday, 6:00 AM - 8:00 PM</li>
+                    </ul>
+                </div>
+
+                <div class="terms-highlight">
+                    <p><strong>✅ Acknowledgment of Terms</strong></p>
+                    <p>By registering an account and using Fresh Wave services, you acknowledge that you have read, understood, and agree to be bound by all 23 sections of these Terms and Conditions. You also acknowledge that you have had the opportunity to ask questions and seek clarification before accepting.</p>
+                    <p style="margin-top: 10px;"><i class="fas fa-clock"></i> Last reviewed: June 7, 2026</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+        <!-- FAQ SECTION -->
+        <div id="faqSection" style="display:none;">
+            <section class="faq-section">
+                <div class="container">
+                    <div class="faq-container">
+                        <div class="faq-header"><h1><i class="fas fa-question-circle"></i> Frequently Asked Questions</h1><p>Find answers to common questions</p></div>
+                        <div class="faq-search"><input type="text" id="faqSearchInput" placeholder="🔍 Search FAQs..." onkeyup="searchFAQ()"></div>
+                        <div class="faq-categories">
+                            <button class="faq-cat-btn active" onclick="filterFAQ('all')">All</button>
+                            <button class="faq-cat-btn" onclick="filterFAQ('ordering')">Ordering</button>
+                            <button class="faq-cat-btn" onclick="filterFAQ('payment')">Payment</button>
+                            <button class="faq-cat-btn" onclick="filterFAQ('delivery')">Delivery</button>
+                            <button class="faq-cat-btn" onclick="filterFAQ('products')">Products</button>
+                            <button class="faq-cat-btn" onclick="filterFAQ('account')">Account</button>
+                        </div>
+                        <div class="faq-grid" id="faqGrid"></div>
+                        <div class="faq-contact-banner"><h3>Still have questions?</h3><p>Our support team is ready to help</p><button onclick="showSupport()">Contact Support</button></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- SUPPORT SECTION -->
+        <div id="supportSection" style="display:none;">
+            <section style="padding: 40px 0;">
+                <div class="container">
+                    <h2><i class="fas fa-headset"></i> Customer Support</h2>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                        <div style="background: var(--card-bg); padding: 25px; border-radius: 15px;">
+                            <div><i class="fas fa-phone"></i> <strong>Call Us</strong><br><a href="tel:+256745942209">+256 745 942 209</a></div>
+                            <div style="margin-top: 15px;"><i class="fab fa-whatsapp"></i> <strong>WhatsApp</strong><br><a href="https://wa.me/256764496110">+256 764 496 110</a></div>
+                            <div style="margin-top: 15px;"><i class="fab fa-instagram"></i> <strong>Instagram</strong><br><a href="https://instagram.com/freshwaveuganda" target="_blank">@freshwaveuganda</a></div>
+                        </div>
+                        <form id="contactForm" style="background: var(--card-bg); padding: 25px; border-radius: 15px;">
+                            <input type="text" id="contactName" placeholder="Your Name" style="width:100%; padding:12px; margin-bottom:10px; border:1px solid var(--border-color); border-radius:8px;">
+                            <input type="tel" id="contactPhone" placeholder="Phone Number" style="width:100%; padding:12px; margin-bottom:10px; border:1px solid var(--border-color); border-radius:8px;">
+                            <textarea id="contactMessage" rows="4" placeholder="Your Message" style="width:100%; padding:12px; margin-bottom:10px; border:1px solid var(--border-color); border-radius:8px;"></textarea>
+                            <button type="submit" style="background:#2e8b57; color:white; border:none; padding:12px; width:100%; border-radius:8px; cursor:pointer;">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- MODALS (Profile, Wishlist, Checkout, Auth, AI Chat) -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content profile-modal-content">
+            <span class="close" onclick="closeProfileModal()">&times;</span>
+            <h2><i class="fas fa-user-circle"></i> My Profile</h2>
+            <div class="profile-tabs">
+                <button class="profile-tab active" onclick="switchProfileTab('info')">Personal Info</button>
+                <button class="profile-tab" onclick="switchProfileTab('security')">Security</button>
+                <button class="profile-tab" onclick="switchProfileTab('preferences')">Preferences</button>
+            </div>
+            <div id="profileInfoTab">
+                <div class="profile-picture"><img id="profileImage" src="https://placehold.co/100x100/2e8b57/white?text=User"><br><button class="upload-photo-btn" onclick="uploadProfileImage()"><i class="fas fa-camera"></i> Change Photo</button><input type="file" id="profileImageInput" style="display:none"></div>
+                <div class="form-group"><label>Full Name</label><input type="text" id="profileName"></div>
+                <div class="form-group"><label>Email</label><input type="email" id="profileEmail" readonly></div>
+                <div class="form-group"><label>Phone</label><input type="tel" id="profilePhone"></div>
+                <div class="form-group"><label>Address</label><textarea id="profileAddress" rows="2"></textarea></div>
+                <button class="confirm-order-btn" onclick="saveProfile()">Save Changes</button>
+            </div>
+            <div id="profileSecurityTab" style="display:none;">
+                <div class="form-group"><label>Current Password</label><input type="password" id="currentPassword"></div>
+                <div class="form-group"><label>New Password</label><input type="password" id="newPassword"></div>
+                <div class="form-group"><label>Confirm Password</label><input type="password" id="confirmPassword"></div>
+                <button class="confirm-order-btn" onclick="saveSecuritySettings()">Save Security</button>
+            </div>
+            <div id="profilePrefsTab" style="display:none;">
+                <div class="form-group"><label>Theme</label><select id="userThemePref" onchange="applyUserThemePref()"><option value="light">Light</option><option value="dark">Dark</option><option value="auto">Auto</option></select></div>
+                <button class="confirm-order-btn" onclick="savePreferences()">Save Preferences</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="wishlistModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeWishlistModal()">&times;</span>
+            <h2><i class="fas fa-heart"></i> My Wishlist</h2>
+            <div id="wishlistItems" class="wishlist-grid"></div>
+        </div>
+    </div>
+
+    <div id="checkoutModal" class="modal">
+        <div class="modal-content" style="max-width: 650px;">
+            <span class="close" onclick="closeCheckoutModal()">&times;</span>
+            <h2><i class="fas fa-shopping-cart"></i> Checkout</h2>
+            <div id="checkoutSummary" class="checkout-summary"></div>
+            <h3>Delivery Information</h3>
+            <textarea id="deliveryAddressInput" rows="2" placeholder="Enter delivery address" style="width:100%; padding:10px; margin:10px 0; border:1px solid var(--border-color); border-radius:8px;"></textarea>
+            <h3>Select Payment Method</h3>
+            <div class="payment-options">
+                <label><input type="radio" name="paymentMethod" value="airtel" onchange="togglePaymentFields()"> Airtel Money</label>
+                <label><input type="radio" name="paymentMethod" value="mtn" onchange="togglePaymentFields()"> MTN Mobile Money</label>
+                <label><input type="radio" name="paymentMethod" value="cod" onchange="togglePaymentFields()"> Cash on Delivery</label>
+            </div>
+            <div id="airtelPaymentSection" style="display:none;" class="payment-section">
+                <div class="till-number-box"><span class="till-number">7104763</span><button class="copy-btn" onclick="copyToClipboard('7104763')">Copy</button></div>
+                <div class="steps"><strong>How to pay:</strong><ol><li>Dial <strong>*185#</strong></li><li>Select "Send Money"</li><li>Enter Till: <strong>7104763</strong></li><li>Enter amount: <strong id="airtelStepAmount">UGX 0</strong></li></ol></div>
+                <input type="tel" id="airtelPhoneNumber" placeholder="Your Airtel Number" style="width:100%; padding:10px; margin:5px 0; border-radius:8px;">
+                <input type="text" id="airtelTransactionReference" placeholder="Transaction Reference" style="width:100%; padding:10px; margin:5px 0; border-radius:8px;">
+                <input type="number" id="airtelAmountPaid" placeholder="Amount Paid" style="width:100%; padding:10px; margin:5px 0; border-radius:8px;">
+            </div>
+            <div id="mtnPaymentSection" style="display:none;" class="payment-section">
+                <div class="till-number-box"><span class="till-number">61967992</span><button class="copy-btn" onclick="copyToClipboard('61967992')">Copy</button></div>
+                <div class="steps"><strong>How to pay:</strong><ol><li>Dial <strong>*165#</strong></li><li>Select "Send Money"</li><li>Enter Number: <strong>61967992</strong></li><li>Enter amount: <strong id="mtnStepAmount">UGX 0</strong></li></ol></div>
+                <input type="tel" id="mtnPhoneNumber" placeholder="Your MTN Number" style="width:100%; padding:10px; margin:5px 0; border-radius:8px;">
+                <input type="text" id="mtnTransactionReference" placeholder="Transaction Reference" style="width:100%; padding:10px; margin:5px 0; border-radius:8px;">
+                <input type="number" id="mtnAmountPaid" placeholder="Amount Paid" style="width:100%; padding:10px; margin:5px 0; border-radius:8px;">
+            </div>
+            <div id="codPaymentSection" style="display:none;" class="payment-section">
+                <p>You will pay cash when your order is delivered.</p>
+            </div>
+            <button class="confirm-order-btn" onclick="confirmOrder()">Place Order</button>
+        </div>
+    </div>
+
+    <div id="paymentConfirmationModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closePaymentConfirmationModal()">&times;</span>
+            <div style="text-align:center; color:#2e8b57; font-size:60px;"><i class="fas fa-check-circle"></i></div>
+            <h3 id="confirmationTitle" style="text-align:center;">Order Confirmed!</h3>
+            <p id="confirmationMessage" style="text-align:center;"></p>
+        </div>
+    </div>
+
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="loginForm">
+                <h3>Login to Your Account</h3>
+                <div class="form-group"><input type="email" id="loginEmail" placeholder="Email Address"></div>
+                <div class="form-group"><input type="password" id="loginPassword" placeholder="Password"></div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="rememberMe">
+                    <label for="rememberMe">Remember me</label>
+                </div>
+                <button onclick="login()" class="confirm-order-btn">Login</button>
+                <p style="margin-top: 15px; text-align: center;">Don't have an account? <a href="#" onclick="showRegisterModal()">Register</a></p>
+            </div>
+            <div id="registerForm" style="display:none">
+                <h3>Create Account</h3>
+                <div class="form-group"><input type="text" id="regName" placeholder="Full Name"></div>
+                <div class="form-group"><input type="email" id="regEmail" placeholder="Email Address"></div>
+                <div class="form-group"><input type="tel" id="regPhone" placeholder="Phone Number"></div>
+                <div class="form-group"><input type="password" id="regPassword" placeholder="Password (min 6)"></div>
+                <div class="form-group"><input type="password" id="regConfirmPassword" placeholder="Confirm Password"></div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="acceptTerms">
+                    <label for="acceptTerms">I agree to the <a href="#" onclick="showTerms()">Terms and Conditions</a></label>
+                </div>
+                <button onclick="register()" class="confirm-order-btn">Create Account</button>
+                <p style="margin-top: 15px; text-align: center;">Already have an account? <a href="#" onclick="showLoginModal()">Login</a></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="aiChatModal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <span class="close" onclick="closeAIChat()">&times;</span>
+            <div style="background:#2e8b57; color:white; padding:15px; border-radius:10px;"><i class="fas fa-robot"></i> <strong>Fresh Wave AI Assistant</strong></div>
+            <div id="chatMessages" style="height:350px; overflow-y:auto; padding:15px; background:var(--bg-primary); border-radius:10px; margin:15px 0;"><div style="background:var(--card-bg); padding:10px; border-radius:10px;">👋 Hello! Ask me about products, delivery, or payments!</div></div>
+            <div style="display:flex; gap:10px;"><input type="text" id="chatInput" placeholder="Type your question..." style="flex:1; padding:12px; border-radius:25px;" onkeypress="if(event.key==='Enter') sendChatMessage()"><button onclick="sendChatMessage()" style="background:#2e8b57; color:white; border:none; width:45px; border-radius:50%;"><i class="fas fa-paper-plane"></i></button></div>
+            <button onclick="transferToHuman()" style="margin-top:15px; background:#25D366; color:white; border:none; padding:12px; width:100%; border-radius:25px;">Chat with Human</button>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section"><img src="Fresh logo.jpg" class="footer-logo"><p><strong>Fresh Wave</strong><br>Kampala, Uganda</p></div>
+                <div class="footer-section"><h4>Quick Links</h4><ul><li><a href="#" onclick="showHome()">Home</a></li><li><a href="#" onclick="showProducts()">Shop</a></li><li><a href="#" onclick="showSupport()">Support</a></li></ul></div>
+                <div class="footer-section"><h4>Contact</h4><p><i class="fas fa-phone"></i> +256 745 942 209</p></div>
+                <div class="footer-section"><h4>Follow Us</h4><div class="social-icons"><a href="https://instagram.com/freshwaveuganda"><i class="fab fa-instagram"></i></a><a href="https://wa.me/256764496110"><i class="fab fa-whatsapp"></i></a></div></div>
+            </div>
+            <div class="footer-bottom"><p>&copy; 2026 Fresh Wave Uganda. All rights reserved.</p></div>
+        </div>
+    </footer>
+
+    <a href="https://wa.me/256764496110" class="whatsapp-float"><i class="fab fa-whatsapp"></i></a>
+    <button class="ai-float-btn" onclick="openAIChat()"><i class="fas fa-robot"></i></button>
+    <div style="position:fixed; bottom:10px; right:10px; opacity:0.3;"><a href="admin-login.html" style="color:#999; text-decoration:none; font-size:10px; background:white; padding:2px 5px; border-radius:5px;">🔒 Admin</a></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
